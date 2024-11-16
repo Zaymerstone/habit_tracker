@@ -92,4 +92,26 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register, login };
+async function checkUser(req, res) {
+  const token = req.headers.authorization?.split(" ")[1]; // Extract the token from the header
+
+  if (!token) {
+    return res.status(401).json({ message: "Authorization token is missing" });
+  }
+
+  try {
+    // Verify the token
+    const decoded = jwt.verify(token, "your_jwt_secret");
+    console.log("Decoded Token:", decoded);
+
+    // Respond with user info or a success message
+    return res
+      .status(200)
+      .json({ message: "User is authenticated", userId: decoded.id });
+  } catch (error) {
+    console.error("Token verification failed:", error);
+    return res.status(401).json({ message: "Invalid or expired token" });
+  }
+}
+
+module.exports = { register, login, checkUser };

@@ -51,6 +51,19 @@ export const registerUser = createAsyncThunk(
   }
 );
 
+// THUNK CHECK USER
+export const checkUser = createAsyncThunk(
+  "user/checkUser",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await tokenizedAxiosInstance.post(ApiPath.CheckUser);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response.data);
+    }
+  }
+);
+
 // LOGIN THUNK
 
 export const loginUser = createAsyncThunk(
