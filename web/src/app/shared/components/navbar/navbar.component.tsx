@@ -14,8 +14,16 @@ import MenuItem from "@mui/material/MenuItem";
 import AdbIcon from "@mui/icons-material/Adb";
 import { Link } from "react-router-dom";
 import { RouterPath } from "../../router/pathes";
+import { useDispatch } from "react-redux";
+import { logout } from "../../../../entitites/user/models/user.slice"; // Adjust the path accordingly
 
 function NavBar() {
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+    dispatch(logout());
+  };
+
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
@@ -38,7 +46,7 @@ function NavBar() {
               </Typography>
             </Box>
             <Box>
-              <Button variant="outlined" color="error">
+              <Button variant="outlined" color="error" onClick={handleLogout}>
                 Logout
               </Button>
             </Box>

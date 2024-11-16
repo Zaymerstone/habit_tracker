@@ -71,7 +71,19 @@ export const loginUser = createAsyncThunk(
 export const userSlice = createSlice({
   name: "user",
   initialState,
-  reducers: {},
+  reducers: {
+    logout: (state) => {
+      state.firstName = initialState.firstName;
+      state.lastName = initialState.lastName;
+      state.level = initialState.level;
+      state.email = initialState.email;
+      state.habits = initialState.habits;
+      state.status = initialState.status;
+      state.isAuthenticated = false;
+      state.token = null;
+      localStorage.removeItem("token");
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(registerUser.pending, (state) => {
@@ -116,6 +128,7 @@ export const userSlice = createSlice({
 // export const {} = userSlice.actions;
 
 export default userSlice.reducer;
+export const { logout } = userSlice.actions;
 
 // import { createSlice } from "@reduxjs/toolkit";
 // import type { PayloadAction } from "@reduxjs/toolkit";
