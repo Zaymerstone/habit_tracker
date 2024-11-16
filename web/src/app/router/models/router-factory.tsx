@@ -4,6 +4,9 @@ import LoginPage from "../../../pages/login/ui/Login.page";
 import RegisterPage from "../../../pages/registration/ui/Registration.page";
 import HomePage from "../../../pages/home/ui/Home.page";
 import ProfilePage from "../../../pages/profile/ui/Profile.page";
+import ProtectedRoute from "../guards/protectedroute.guard";
+import PrivateRoute from "../guards/privateroute.guard";
+import AuthenticatedLayout from "../components/authenticated-layout.comp";
 
 // define a routes using the createBrowserRouter component from react-dom library
 
@@ -15,19 +18,44 @@ export const routerFactory = () =>
       children: [
         {
           path: RouterPath.Login, // path
-          element: <LoginPage />, // component itself
+          element: (
+            <ProtectedRoute redirectTo={RouterPath.HomePage}>
+              <LoginPage />
+            </ProtectedRoute>
+          ), // component itself
         },
         {
           path: RouterPath.Registration,
-          element: <RegisterPage />,
+          element: (
+            <ProtectedRoute redirectTo={RouterPath.HomePage}>
+              <RegisterPage />
+            </ProtectedRoute>
+          ),
         },
         {
-          path: RouterPath.HomePage,
-          element: <HomePage />,
-        },
-        {
-          path: RouterPath.UserProfile,
-          element: <ProfilePage />,
+          element: <PrivateRoute redirectTo={RouterPath.Login} />,
+          children: [
+            {
+              path: RouterPath.HomePage,
+              element: <AuthenticatedLayout />,
+              children: [
+                {
+                  path: "",
+                  element: <HomePage />,
+                },
+              ],
+            },
+            {
+              path: RouterPath.UserProfile,
+              element: <AuthenticatedLayout />,
+              children: [
+                {
+                  path: "",
+                  element: <ProfilePage />,
+                },
+              ],
+            },
+          ],
         },
       ],
     },

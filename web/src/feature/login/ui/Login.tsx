@@ -7,8 +7,12 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { useAppDispatch } from "../../../app/shared/hooks/redux";
+import { loginUser } from "../../../entitites/user/models/user.slice";
 
 export default function Login() {
+  const dispatch = useAppDispatch();
+
   return (
     <>
       <Box>
@@ -22,6 +26,12 @@ export default function Login() {
             flexDirection: "column",
             width: "100%",
             gap: 4,
+          }}
+          onSubmit={(e) => {
+            e.preventDefault();
+            const formData = new FormData(e.currentTarget);
+            const user = Object.fromEntries(formData);
+            void dispatch(loginUser(user)); // Dispatch loginUser thunk
           }}
         >
           <FormControl>
@@ -60,7 +70,12 @@ export default function Login() {
               variant="outlined"
             />
           </FormControl>
-          <Button variant="contained" fullWidth sx={{ height: "48px" }}>
+          <Button
+            variant="contained"
+            fullWidth
+            sx={{ height: "48px" }}
+            type="submit"
+          >
             Sign in
           </Button>
           <Typography sx={{ textAlign: "center" }}>

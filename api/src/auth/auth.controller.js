@@ -15,16 +15,31 @@ const register = async (req, res) => {
     }
 
     const hashpass = await bcrypt.hash(password, 10);
-    // добавил roleId:1, level:2, чтобы зачекать фронт
-    await User.create({
+
+    const newUser = await User.create({
       username,
       email,
-      password: hashpass,
+      password_hash: hashpass,
       roleId: 1,
       level: 2,
     });
 
-    return res.status(201).json({ message: "Successful registration" });
+    // Generate token for the new user
+    const token = jwt.sign({ id: newUser.id }, "your_jwt_secret", {
+      expiresIn: "1h",
+    });
+
+    // Respond with the token and user details
+    return res.status(201).json({
+      message: "Successful registration",
+      token,
+      user: {
+        id: newUser.id,
+        username: newUser.username,
+        email: newUser.email,
+        level: newUser.level,
+      },
+    });
   } catch (error) {
     console.error("Database error:", error);
     return res.status(500).json({ message: "Server error" });
@@ -43,20 +58,38 @@ const login = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    // Log the user data and password (don't log sensitive info in production)
+    console.log("User:", user);
+    console.log("Password from request:", password); // дебаг
+    console.log("Password hash from database:", user.password_hash);
+
+    // Compare the password with the password_hash field
+    const isPasswordValid = await bcrypt.compare(password, user.password_hash); // use 'password_hash' instead of 'password'
 
     if (!isPasswordValid) {
       return res.status(401).json({ message: "Invalid password" });
     }
 
-    // Заменить на переменную в env потом
+    // Generate token for the existing user
     const token = jwt.sign({ id: user.id }, "your_jwt_secret", {
-      expiresIn: "1h",
+      expiresIn: "1h", // сделать на пару дней
     });
-    return res.status(200).json({ message: "Successful authorization", token });
+
+    // Respond with the token and user details
+    return res.status(200).json({
+      message: "Successful authorization",
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        level: user.level,
+      },
+    });
   } catch (error) {
     console.error("Database error:", error);
     return res.status(500).json({ message: "Server error" });
   }
 };
+
 module.exports = { register, login };

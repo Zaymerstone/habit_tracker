@@ -9,15 +9,15 @@ function App() {
       <Provider store={store}>
         <AppRouter />
       </Provider>
-      {/* <ToastContainer
-        position="bottom-left" // Позиция в левом нижнем углу
+      <ToastContainer
+        position="top-center" // Позиция в левом нижнем углу
         autoClose={3000} // Время автоматического закрытия (3 секунды)
         hideProgressBar={true} // Убрать анимацию прогресс-бара
         closeOnClick={true} // Закрыть при клике на уведомление
         pauseOnHover={true} // Пауза при наведении мыши
         draggable={true} // Возможность перетягивать тосты курсором
         limit={3}
-      /> */}
+      />
     </>
   );
 }
