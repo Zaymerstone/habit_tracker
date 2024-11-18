@@ -8,7 +8,8 @@ import {
   Typography,
 } from "@mui/material";
 import { useAppDispatch } from "../../../app/shared/hooks/redux";
-import { loginUser } from "../../../entitites/user/models/user.slice";
+import { loginUser } from "../../../entitites/user/models/user.slice.ts";
+import { LoginUserPayload } from "../../../entitites/user/types/user.payload";
 
 export default function Login() {
   const dispatch = useAppDispatch();
@@ -30,7 +31,7 @@ export default function Login() {
           onSubmit={(e) => {
             e.preventDefault();
             const formData = new FormData(e.currentTarget);
-            const user = {
+            const user: LoginUserPayload = {
               email: formData.get("email") as string,
               password: formData.get("password") as string,
             };

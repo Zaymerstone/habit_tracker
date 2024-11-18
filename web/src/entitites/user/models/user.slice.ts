@@ -7,6 +7,7 @@ import { ApiPath } from "../../../app/api/pathes";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import styles
 import { AxiosError } from "axios";
+import { LoginUserPayload, RegisterUserPayload } from "../types/user.payload";
 
 export interface UserState {
   firstName: string;
@@ -35,7 +36,7 @@ const initialState: UserState = {
 
 export const registerUser = createAsyncThunk(
   "user/register",
-  async (userData, { rejectWithValue }) => {
+  async (userData: RegisterUserPayload, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(ApiPath.Registration, userData);
 
@@ -73,10 +74,7 @@ export const checkUser = createAsyncThunk(
 
 export const loginUser = createAsyncThunk(
   "user/login",
-  async (
-    loginData: { email: string; password: string },
-    { rejectWithValue }
-  ) => {
+  async (loginData: LoginUserPayload, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(ApiPath.Login, loginData); //axios instance было
 

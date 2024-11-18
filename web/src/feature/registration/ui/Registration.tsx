@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { useAppDispatch } from "../../../app/shared/hooks/redux";
 import { registerUser } from "../../../entitites/user/models/user.slice";
+import { RegisterUserPayload } from "../../../entitites/user/types/user.payload";
 
 export default function Register() {
   const dispatch = useAppDispatch();
@@ -29,7 +30,11 @@ export default function Register() {
           onSubmit={(e) => {
             e.preventDefault();
             const formData = new FormData(e.currentTarget);
-            const user = Object.fromEntries(formData);
+            const user: RegisterUserPayload = {
+              username: formData.get("username") as string,
+              email: formData.get("email") as string,
+              password: formData.get("password") as string,
+            };
             void dispatch(registerUser(user));
           }}
         >
