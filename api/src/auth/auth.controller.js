@@ -59,9 +59,6 @@ const login = async (req, res) => {
     }
 
     // Log the user data and password (don't log sensitive info in production)
-    console.log("User:", user);
-    console.log("Password from request:", password); // дебаг
-    console.log("Password hash from database:", user.password_hash);
 
     // Compare the password with the password_hash field
     const isPasswordValid = await bcrypt.compare(password, user.password_hash); // use 'password_hash' instead of 'password'
@@ -101,13 +98,21 @@ async function checkUser(req, res) {
 
   try {
     // Verify the token
-    const decoded = jwt.verify(token, "your_jwt_secret");
-    console.log("Decoded Token:", decoded);
-
+    const decoded = jwt.verify(token, "your_jwt_secret"); // заменить на енвешку
+    const user = await User.findOne({
+      where: { id: decoded.id },
+    });
     // Respond with user info or a success message
-    return res
-      .status(200)
-      .json({ message: "User is authenticated", userId: decoded.id });
+    return res.status(200).json({
+      message: "User is authenticated",
+      user: {
+        firstname: user.username,
+        email: user.email,
+        level: user.level,
+        xp: user.xp,
+        roleId: user.roleId,
+      },
+    });
   } catch (error) {
     console.error("Token verification failed:", error);
     return res.status(401).json({ message: "Invalid or expired token" });

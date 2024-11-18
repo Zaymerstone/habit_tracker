@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import { useAppSelector } from "../../shared/hooks/redux";
 import { Navigate } from "react-router-dom";
 interface ProtectedRouteProps {

@@ -6,6 +6,7 @@ import {
 import { ApiPath } from "../../../app/api/pathes";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import styles
+import { AxiosError } from "axios";
 
 export interface UserState {
   firstName: string;
@@ -42,11 +43,10 @@ export const registerUser = createAsyncThunk(
       toast.success("Registration successful!");
 
       return response.data;
-    } catch (error) {
-      // Display an error toast for this specific case
-      // toast.error("Registration failed: " + error.response.data.message);
-
-      return rejectWithValue(error.response.data);
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(error.response?.data);
+      }
     }
   }
 );
@@ -54,12 +54,17 @@ export const registerUser = createAsyncThunk(
 // THUNK CHECK USER
 export const checkUser = createAsyncThunk(
   "user/checkUser",
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, dispatch }) => {
     try {
-      const response = await tokenizedAxiosInstance.post(ApiPath.CheckUser);
+      const response = await tokenizedAxiosInstance.get(ApiPath.CheckUser);
       return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response.data);
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        if (error.response && error.response.status === 401) {
+          dispatch(logout());
+        }
+        return rejectWithValue(error.response?.data);
+      }
     }
   }
 );
@@ -68,15 +73,20 @@ export const checkUser = createAsyncThunk(
 
 export const loginUser = createAsyncThunk(
   "user/login",
-  async (loginData, { rejectWithValue }) => {
+  async (
+    loginData: { email: string; password: string },
+    { rejectWithValue }
+  ) => {
     try {
       const response = await axiosInstance.post(ApiPath.Login, loginData); //axios instance было
 
       toast.success(`Logged in as ${response.data.user.email}`);
 
       return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response.data);
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(error.response?.data);
+      }
     }
   }
 );
@@ -133,6 +143,13 @@ export const userSlice = createSlice({
       .addCase(loginUser.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;
+      })
+      .addCase(checkUser.fulfilled, (state, action) => {
+        state.status = "idle";
+        state.firstName = action.payload.user.firstName;
+        state.lastName = action.payload.user.lastName;
+        state.email = action.payload.user.email;
+        state.level = action.payload.user.level;
       });
   },
 });

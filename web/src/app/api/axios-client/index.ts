@@ -60,9 +60,9 @@ const setupInterceptor = (instance: AxiosInstance) => {
       // Check if 'suppress-toast' header is set; skip the toast if true
       if (errorResponse && errorResponse.status < 500) {
         const currentToastMessage = errorResponse.data.message;
-
+        console.log(currentToastMessage);
         // Prevent duplicate toasts by comparing messages
-        if (currentToastMessage && currentToastMessage !== "Unauthorized") {
+        if (error.response.status !== 401) {
           toast.error(`Error: ${currentToastMessage}`);
         }
       }

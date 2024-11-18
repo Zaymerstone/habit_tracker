@@ -1,10 +1,4 @@
 // import { increment } from "../../../entitites/user/models/user.slice";
-import { Button, TextField } from "@mui/material";
-import {
-  useAppDispatch,
-  useAppSelector,
-} from "../../../app/shared/hooks/redux";
-import { useState } from "react";
 
 export default function HomePage() {
   // const dispatch = useAppDispatch();

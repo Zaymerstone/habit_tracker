@@ -8,10 +8,10 @@ import {
 import { useState } from "react";
 function Register(): JSX.Element {
   const [message, setMessage] = useState();
-  const [open, setOpen] = useState();
-  const submitHandler = async (e) => {
+  const [open, setOpen] = useState<boolean>();
+  const submitHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const data = new FormData(e.target);
+    const data = new FormData(e.target as HTMLFormElement);
     console.log(data);
     const newData = Object.fromEntries(data);
     const response = await fetch("http://localhost:3000/auth/login", {

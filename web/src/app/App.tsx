@@ -2,9 +2,6 @@ import { ToastContainer } from "react-toastify";
 import AppRouter from "./router/components/app-router.comp";
 import { store } from "./store";
 import { Provider } from "react-redux";
-import { Button } from "@mui/material";
-import { useAppDispatch } from "./shared/hooks/redux";
-import { checkUser } from "../entitites/user/models/user.slice";
 
 function App() {
   return (
