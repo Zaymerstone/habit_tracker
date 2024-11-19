@@ -11,6 +11,7 @@ import {
   Typography,
 } from "@mui/material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime"; // Example icon
+import theme from "../../../styles/theme";
 
 export default function HomePage() {
   // const dispatch = useAppDispatch();
@@ -24,7 +25,7 @@ export default function HomePage() {
         minHeight: "100vh",
         padding: 2,
         gap: 2,
-        backgroundColor: "#f5f5f5",
+        backgroundColor: theme.palette.background.default,
         overflow: "hidden", // Prevent browser scroll
       }}
     >
@@ -35,7 +36,7 @@ export default function HomePage() {
           overflowY: "auto",
           maxHeight: "100vh",
           padding: 2,
-          backgroundColor: "#ffffff",
+          backgroundColor: theme.palette.background.default,
           borderRadius: 2,
           boxShadow: 3,
           minWidth: 0, // Prevent horizontal scroll
