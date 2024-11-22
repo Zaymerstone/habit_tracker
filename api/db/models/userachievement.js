@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+"use strict";
+const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class UserAchievement extends Model {
     /**
@@ -10,18 +8,24 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      UserAchievement.belongsTo(models.Habit, { foreignKey: "habit" })
-      UserAchievement.belongsTo(models.User, { foreignKey: "user" })
-      UserAchievement.belongsTo(models.Mastery, { foreignKey: "mastery" })
+      UserAchievement.belongsTo(models.Habit, { foreignKey: "habitId" });
+      UserAchievement.belongsTo(models.User, {
+        foreignKey: "userId",
+        onDelete: "CASCADE",
+      });
+      UserAchievement.belongsTo(models.Mastery, { foreignKey: "masteryId" });
     }
   }
-  UserAchievement.init({
-    user: DataTypes.BIGINT,
-    habit: DataTypes.BIGINT,
-    mastery: DataTypes.BIGINT
-  }, {
-    sequelize,
-    modelName: 'UserAchievement',
-  });
+  UserAchievement.init(
+    {
+      userId: DataTypes.BIGINT,
+      habitId: DataTypes.BIGINT,
+      masteryId: DataTypes.BIGINT,
+    },
+    {
+      sequelize,
+      modelName: "UserAchievement",
+    }
+  );
   return UserAchievement;
 };

@@ -7,6 +7,7 @@ import ProfilePage from "../../../pages/profile/ui/Profile.page";
 import ProtectedRoute from "../guards/protectedroute.guard";
 import PrivateRoute from "../guards/privateroute.guard";
 import AuthenticatedLayout from "../components/authenticated-layout.comp";
+import { userLoader } from "../loaders/user-loader";
 
 // define a routes using the createBrowserRouter component from react-dom library
 
@@ -38,6 +39,7 @@ export const routerFactory = () =>
             {
               path: RouterPath.HomePage,
               element: <AuthenticatedLayout />,
+              loader: userLoader,
               children: [
                 {
                   path: "",
@@ -48,6 +50,7 @@ export const routerFactory = () =>
             {
               path: RouterPath.UserProfile,
               element: <AuthenticatedLayout />,
+              loader: userLoader,
               children: [
                 {
                   path: "",

@@ -37,7 +37,7 @@
 //   return config;
 // });
 
-// CHATGPT BELOW
+//
 
 import axios, { AxiosInstance } from "axios";
 import { toast } from "react-toastify";

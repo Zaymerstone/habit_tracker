@@ -21,7 +21,7 @@ const register = async (req, res) => {
       email,
       password_hash: hashpass,
       roleId: 1,
-      level: 2,
+      level: 2, // zamenit na levelId i na 1
     });
 
     // Generate token for the new user
@@ -37,7 +37,7 @@ const register = async (req, res) => {
         id: newUser.id,
         username: newUser.username,
         email: newUser.email,
-        level: newUser.level,
+        level: newUser.level, // zamenit na levelId i na newUser.levelId
       },
     });
   } catch (error) {
@@ -80,7 +80,7 @@ const login = async (req, res) => {
         id: user.id,
         username: user.username,
         email: user.email,
-        level: user.level,
+        level: user.level, // zamenit na levelId oba
       },
     });
   } catch (error) {
@@ -90,17 +90,20 @@ const login = async (req, res) => {
 };
 
 async function checkUser(req, res) {
-  const token = req.headers.authorization?.split(" ")[1]; // Extract the token from the header
+  // const token = req.headers.authorization?.split(" ")[1]; // Extract the token from the header
 
-  if (!token) {
-    return res.status(401).json({ message: "Authorization token is missing" });
-  }
+  // if (!token) {
+  //   return res.status(401).json({ message: "Authorization token is missing" });
+  // }
 
+  // try {
+  //   // Verify the token
+  //   const decoded = jwt.verify(token, "your_jwt_secret"); // заменить на енвешку
+  const userId = req.userId;
+  console.log(userId);
   try {
-    // Verify the token
-    const decoded = jwt.verify(token, "your_jwt_secret"); // заменить на енвешку
     const user = await User.findOne({
-      where: { id: decoded.id },
+      where: { id: userId },
     });
     // Respond with user info or a success message
     return res.status(200).json({
@@ -108,7 +111,7 @@ async function checkUser(req, res) {
       user: {
         firstname: user.username,
         email: user.email,
-        level: user.level,
+        level: user.level, // zamenit na levelId oba
         xp: user.xp,
         roleId: user.roleId,
       },

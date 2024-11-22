@@ -1,5 +1,5 @@
 export enum ApiPath {
-  Login = "/auth/login",
+  Login = "/auth/login", // pathes that lead to backend
 
   Registration = "/auth/register",
 

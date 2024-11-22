@@ -1,39 +1,48 @@
-'use strict';
+"use strict";
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('UserAchievements', {
+    await queryInterface.createTable("UserAchievements", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
       },
-      user: {
+      userId: {
         allowNull: false,
         type: Sequelize.BIGINT,
+        onDelete: "CASCADE",
         references: {
-          model:"Users",
-          key: "id"
-        } 
+          model: "Users",
+          key: "id",
+        },
       },
-      habit: {
-        type: Sequelize.BIGINT
+      habitId: {
+        type: Sequelize.BIGINT,
+        references: {
+          model: "Habits",
+          key: "id",
+        },
       },
-      mastery: {
-        type: Sequelize.BIGINT
+      masteryId: {
+        type: Sequelize.BIGINT,
+        references: {
+          model: "Masteries",
+          key: "id",
+        },
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
-      }
+        type: Sequelize.DATE,
+      },
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('UserAchievements');
-  }
+    await queryInterface.dropTable("UserAchievements");
+  },
 };
