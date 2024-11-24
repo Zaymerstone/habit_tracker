@@ -21,7 +21,7 @@ const register = async (req, res) => {
       email,
       password_hash: hashpass,
       roleId: 1,
-      level: 2, // zamenit na levelId i na 1
+      levelId: 1, // zamenit na levelId i na 1
     });
 
     // Generate token for the new user
@@ -37,7 +37,7 @@ const register = async (req, res) => {
         id: newUser.id,
         username: newUser.username,
         email: newUser.email,
-        level: newUser.level, // zamenit na levelId i na newUser.levelId
+        levelId: newUser.levelId, // zamenit na levelId i na newUser.levelId
       },
     });
   } catch (error) {
@@ -80,7 +80,7 @@ const login = async (req, res) => {
         id: user.id,
         username: user.username,
         email: user.email,
-        level: user.level, // zamenit na levelId oba
+        levelId: user.levelId, // zamenit na levelId oba
       },
     });
   } catch (error) {
@@ -111,7 +111,7 @@ async function checkUser(req, res) {
       user: {
         firstname: user.username,
         email: user.email,
-        level: user.level, // zamenit na levelId oba
+        levelId: user.levelId, // zamenit na levelId oba
         xp: user.xp,
         roleId: user.roleId,
       },
