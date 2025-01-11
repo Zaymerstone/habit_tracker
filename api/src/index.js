@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const { authRouter } = require("./auth/auth.routes");
+const { habitRouter } = require("./habits/habit.routes");
 const app = express(); // экземпляр приложения we can define routes, middleware, settings using app
 app.use(
   cors({
@@ -14,4 +15,5 @@ app.use(morgan("dev")); // для логов в чате, чтобы отобр�
 app.use(express.urlencoded({ extended: true })); // это мидлвэр функция
 app.use(express.json()); // parse data in json
 app.use("/auth", authRouter);
+app.use("/habits", habitRouter);
 app.listen(3000);

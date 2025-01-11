@@ -15,9 +15,6 @@ module.exports = {
       streak_target: {
         type: Sequelize.INTEGER,
       },
-      img_url: {
-        type: Sequelize.STRING,
-      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

@@ -18,9 +18,9 @@ module.exports = (sequelize, DataTypes) => {
   }
   UserAchievement.init(
     {
-      userId: DataTypes.BIGINT,
-      habitId: DataTypes.BIGINT,
-      masteryId: DataTypes.BIGINT,
+      userId: DataTypes.INTEGER,
+      habitId: DataTypes.INTEGER,
+      masteryId: DataTypes.INTEGER,
     },
     {
       sequelize,

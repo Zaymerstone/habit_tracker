@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const { User } = require("../../db/models");
+const { User, Habit, Level, UserAchievement, Mastery } = require("../../db/models");
 
 const register = async (req, res) => {
   const { username, email, password } = req.body;
@@ -52,6 +52,7 @@ const login = async (req, res) => {
   try {
     const user = await User.findOne({
       where: { email },
+      include: [Habit],
     });
 
     if (!user) {
@@ -72,6 +73,8 @@ const login = async (req, res) => {
       expiresIn: "1h", // сделать на пару дней
     });
 
+    console.log("user data: ", user);
+
     // Respond with the token and user details
     return res.status(200).json({
       message: "Successful authorization",
@@ -81,6 +84,7 @@ const login = async (req, res) => {
         username: user.username,
         email: user.email,
         levelId: user.levelId, // zamenit na levelId oba
+        habits: user.Habit,
       },
     });
   } catch (error) {
@@ -90,30 +94,34 @@ const login = async (req, res) => {
 };
 
 async function checkUser(req, res) {
-  // const token = req.headers.authorization?.split(" ")[1]; // Extract the token from the header
-
-  // if (!token) {
-  //   return res.status(401).json({ message: "Authorization token is missing" });
-  // }
-
-  // try {
-  //   // Verify the token
-  //   const decoded = jwt.verify(token, "your_jwt_secret"); // заменить на енвешку
-  const userId = req.userId;
-  console.log(userId);
   try {
+    const userId = req.userId;
+
     const user = await User.findOne({
       where: { id: userId },
+      include: [
+        { model: Habit },
+        { model: Level },
+        {
+          model: UserAchievement,
+          include: [{ model: Mastery}, {model: Habit}],
+          attributes: ["userId", "habitId", "createdAt"] 
+        },
+      ],
     });
+
+    console.log("user data: ", user);
     // Respond with user info or a success message
     return res.status(200).json({
       message: "User is authenticated",
       user: {
-        firstname: user.username,
+        username: user.username,
         email: user.email,
-        levelId: user.levelId, // zamenit na levelId oba
+        level: user.Level, // zamenit na levelId oba
         xp: user.xp,
         roleId: user.roleId,
+        habits: user.Habits,
+        achievements: user.UserAchievements,
       },
     });
   } catch (error) {

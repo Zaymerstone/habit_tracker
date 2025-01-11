@@ -9,12 +9,31 @@ import "react-toastify/dist/ReactToastify.css"; // Import styles
 import { AxiosError } from "axios";
 import { LoginUserPayload, RegisterUserPayload } from "../types/user.payload";
 
+export interface HabitData {
+  id: number;
+  name: string;
+  max_streak: number;
+  streak: number;
+}
+
+export interface MasteryData {
+  id: number;
+  title: string;
+  streak_target: number;
+}
+
+export interface AchievementData {
+  userId: number;
+  Habit: HabitData;
+  Mastery: MasteryData;
+  createdAt: string;
+}
+
 export interface UserState {
-  firstName: string;
-  lastName: string;
   email: string;
   level: number;
-  habits: string[];
+  habits: HabitData[];
+  achievements: AchievementData[];
   error: string | null;
   status: "loading" | "idle" | "failed";
   token: string | null;
@@ -22,11 +41,10 @@ export interface UserState {
 }
 
 const initialState: UserState = {
-  firstName: "",
-  lastName: "",
   email: "",
   level: 0,
   habits: [],
+  achievements: [],
   error: null,
   status: "idle",
   token: localStorage.getItem("token") || null,
@@ -94,8 +112,6 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     logout: (state) => {
-      state.firstName = initialState.firstName;
-      state.lastName = initialState.lastName;
       state.level = initialState.level;
       state.email = initialState.email;
       state.habits = initialState.habits;
@@ -112,8 +128,6 @@ export const userSlice = createSlice({
         state.status = "loading";
       })
       .addCase(registerUser.fulfilled, (state, action) => {
-        state.firstName = action.payload.user.firstName;
-        state.lastName = action.payload.user.lastName;
         state.level = action.payload.user.level;
         state.token = action.payload.token;
         state.status = action.payload.status;
@@ -129,11 +143,10 @@ export const userSlice = createSlice({
         state.status = "loading";
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        state.firstName = action.payload.user.firstName;
-        state.lastName = action.payload.user.lastName;
         state.email = action.payload.user.email;
         state.level = action.payload.user.level;
         state.token = action.payload.token;
+        state.habits = action.payload.user.habits;
         state.status = "idle";
         state.isAuthenticated = true;
         localStorage.setItem("token", action.payload.token);
@@ -144,10 +157,10 @@ export const userSlice = createSlice({
       })
       .addCase(checkUser.fulfilled, (state, action) => {
         state.status = "idle";
-        state.firstName = action.payload.user.firstName;
-        state.lastName = action.payload.user.lastName;
         state.email = action.payload.user.email;
+        state.habits = action.payload.user.habits;
         state.level = action.payload.user.level;
+        state.achievements = action.payload.user.achievements;
       });
   },
 });

@@ -11,7 +11,7 @@ module.exports = {
       },
       userId: {
         allowNull: false,
-        type: Sequelize.BIGINT,
+        type: Sequelize.INTEGER,
         onDelete: "CASCADE",
         references: {
           model: "Users",
@@ -19,14 +19,14 @@ module.exports = {
         },
       },
       habitId: {
-        type: Sequelize.BIGINT,
+        type: Sequelize.INTEGER,
         references: {
           model: "Habits",
           key: "id",
         },
       },
       masteryId: {
-        type: Sequelize.BIGINT,
+        type: Sequelize.INTEGER,
         references: {
           model: "Masteries",
           key: "id",

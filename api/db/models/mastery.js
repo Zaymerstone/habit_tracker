@@ -14,8 +14,7 @@ module.exports = (sequelize, DataTypes) => {
   Mastery.init(
     {
       title: DataTypes.STRING,
-      streak_target: DataTypes.INTEGER,
-      img_url: DataTypes.STRING,
+      streak_target: DataTypes.INTEGER
     },
     {
       sequelize,

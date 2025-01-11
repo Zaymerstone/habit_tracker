@@ -5,9 +5,9 @@ import RegisterPage from "../../../pages/registration/ui/Registration.page";
 import HomePage from "../../../pages/home/ui/Home.page";
 import ProfilePage from "../../../pages/profile/ui/Profile.page";
 import ProtectedRoute from "../guards/protectedroute.guard";
-import PrivateRoute from "../guards/privateroute.guard";
 import AuthenticatedLayout from "../components/authenticated-layout.comp";
 import { userLoader } from "../loaders/user-loader";
+import AuthenticatedRoute from "../guards/authenticatedroute.guard";
 
 // define a routes using the createBrowserRouter component from react-dom library
 
@@ -19,44 +19,34 @@ export const routerFactory = () =>
       children: [
         {
           path: RouterPath.Login, // path
-          element: (
-            <ProtectedRoute redirectTo={RouterPath.HomePage}>
+          element:
+            (<AuthenticatedRoute redirectTo={RouterPath.HomePage}>
               <LoginPage />
-            </ProtectedRoute>
-          ), // component itself
+            </AuthenticatedRoute>)
         },
         {
           path: RouterPath.Registration,
-          element: (
-            <ProtectedRoute redirectTo={RouterPath.HomePage}>
+          element:
+            (<AuthenticatedRoute redirectTo={RouterPath.HomePage}>
               <RegisterPage />
-            </ProtectedRoute>
-          ),
+            </AuthenticatedRoute>),
         },
         {
-          element: <PrivateRoute redirectTo={RouterPath.Login} />,
+          path: RouterPath.Root,
+          element:
+            (<ProtectedRoute redirectTo={RouterPath.Login}>
+              <AuthenticatedLayout />
+            </ProtectedRoute>),
           children: [
             {
               path: RouterPath.HomePage,
-              element: <AuthenticatedLayout />,
-              loader: userLoader,
-              children: [
-                {
-                  path: "",
-                  element: <HomePage />,
-                },
-              ],
+              element: <HomePage />,
+              loader: userLoader
             },
             {
               path: RouterPath.UserProfile,
-              element: <AuthenticatedLayout />,
+              element: <ProfilePage />,
               loader: userLoader,
-              children: [
-                {
-                  path: "",
-                  element: <ProfilePage />,
-                },
-              ],
             },
           ],
         },

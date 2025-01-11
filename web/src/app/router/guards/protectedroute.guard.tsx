@@ -10,5 +10,5 @@ export default function ProtectedRoute({
   redirectTo,
 }: ProtectedRouteProps) {
   const isAuthenticated = useAppSelector((state) => state.user.isAuthenticated);
-  return isAuthenticated ? <Navigate to={redirectTo} replace /> : children;
+  return isAuthenticated ? children : <Navigate to={redirectTo} replace />;
 }

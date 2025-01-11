@@ -28,8 +28,7 @@ module.exports = (sequelize, DataTypes) => {
       last_login: DataTypes.DATE,
       levelId: DataTypes.INTEGER,
       xp: DataTypes.INTEGER,
-      roleId: DataTypes.INTEGER,
-      userId: DataTypes.INTEGER,
+      roleId: DataTypes.INTEGER
     },
     {
       sequelize,
