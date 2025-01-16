@@ -6,19 +6,23 @@ import {
     Stack,
     Typography,
 } from "@mui/material";
-import { AchievementData, HabitData } from "../../../../entitites/user/models/user.slice";
+import { AchievementData } from "../../../../entitites/user/models/user.slice";
 import Bronze from "../../../assets/bronze.png";
 import Silver from "../../../assets/silver.png";
 import Gold from "../../../assets/gold.png";
+import { HabitData } from "../../../../entitites/habit/models/habit.slice";
+import { formatDate, getDayNameByIndex } from "../../../../utils";
 
 interface HabitProps {
     habit: HabitData
     achievements: AchievementData[]
+    editHandler: (habit: HabitData) => void
+    deleteHandler: (id: number) => void
 }
 
 const masteryImages = [Bronze, Silver, Gold]
 
-function Habit({ habit, achievements }: HabitProps) {
+function Habit({ habit, achievements, editHandler, deleteHandler }: HabitProps) {
     const habitMasteries = achievements.filter(a => a.Habit.id === habit.id).sort((a, b) => a.Mastery.streak_target - b.Mastery.streak_target)
     return (
         <Card sx={{ boxShadow: 2, padding: 2 }}>
@@ -33,12 +37,21 @@ function Habit({ habit, achievements }: HabitProps) {
                 <Typography variant="body1" sx={{ mb: 1 }}>
                     Current streak is <Typography component="span" fontWeight="600" fontSize="1.2rem">{habit.streak}</Typography>
                 </Typography>
+                <Typography variant="body1" sx={{ mb: 1 }}>
+                    Days habit should be done: <Typography component="span" fontWeight="600" fontSize="1.2rem">{habit.everyday ? "Daily" : `${habit.days.map(d => getDayNameByIndex(d)).join(", ")}`}</Typography>
+                </Typography>
+                <Typography variant="body1" sx={{ mb: 1 }}>
+                    Last completion date: <Typography component="span" fontWeight="600" fontSize="1.2rem">{habit.lastCompletion ? formatDate(habit.lastCompletion) : "Not completed yet"}</Typography>
+                </Typography>
                 <Stack direction="row" spacing={1}>
-                    <Button variant="contained" color="primary" size="small">
+                    <Button variant="outlined" color="info" size="small" onClick={() => editHandler(habit)}>
                         Edit
                     </Button>
-                    <Button variant="outlined" color="error" size="small">
+                    <Button variant="outlined" color="error" size="small" onClick={() => deleteHandler(habit.id)}>
                         Delete
+                    </Button>
+                    <Button variant="contained" color="primary" size="small" onClick={() => console.log("Completing")}>
+                        Complete
                     </Button>
                 </Stack>
             </CardContent>

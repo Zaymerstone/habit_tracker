@@ -18,6 +18,15 @@ module.exports = {
       streak: {
         type: Sequelize.INTEGER,
       },
+      days: {
+        type: Sequelize.ARRAY(Sequelize.INTEGER),
+      },
+      everyday: {
+        type: Sequelize.BOOLEAN,
+      },
+      lastCompletion: {
+        type: Sequelize.DATE,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

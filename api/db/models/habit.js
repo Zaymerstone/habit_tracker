@@ -20,6 +20,9 @@ module.exports = (sequelize, DataTypes) => {
       name: DataTypes.STRING,
       max_streak: DataTypes.INTEGER,
       streak: DataTypes.INTEGER,
+      days: DataTypes.ARRAY(DataTypes.INTEGER),
+      everyday: DataTypes.BOOLEAN,
+      lastCompletion: DataTypes.DATE,
       userId: DataTypes.INTEGER,
     },
     {

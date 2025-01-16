@@ -4,19 +4,23 @@ import {
   Button,
   Card,
   CardContent,
-  Stack,
   Typography,
 } from "@mui/material";
+import { useAppSelector } from "../../../app/shared/hooks/redux";
+import { formatDate } from "../../../utils";
 
 export default function ProfilePage() {
+  const user = useAppSelector((state) => state.user);
+
+  const habitWithHighestStreak = Math.max(...user.habits.map((h) => (h.max_streak)))
   return (
     <Box
       sx={{
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        minHeight: "100vh",
-        backgroundColor: "#f5f5f5", // Optional background color for the page
+        height: "91%",
+        backgroundColor: "#E8F9FF", // Optional background color for the page
         padding: 2,
       }}
     >
@@ -42,13 +46,13 @@ export default function ProfilePage() {
             Change Picture
           </Button>
           {/* Stats Section */}
-          <Stack spacing={1}>
-            <Typography variant="h6">Days Active:</Typography>
-            <Typography variant="h6">Habits Count:</Typography>
-            <Typography variant="h6">Best Streak:</Typography>
-            <Typography variant="h6">Best Level:</Typography>
-            <Typography variant="h6">Best Mastery:</Typography>
-          </Stack>
+          <Box>
+            <Typography variant="h6">Active since: {formatDate(user.createdAt)}</Typography>
+            {/* <Typography variant="h6">Current Level: {user.level}</Typography> */}
+            <Typography variant="h6">Habits Count: {user.habits.length}</Typography>
+            <Typography variant="h6">Max Habit Streak: {habitWithHighestStreak}</Typography>
+            <Typography variant="h6">Masteries achieved: {user.achievements.length}</Typography>
+          </Box>
         </CardContent>
       </Card>
     </Box>

@@ -7,3 +7,9 @@ export function formatDate(dateString: string) {
 
     return `${day}.${month}.${year}`;
 }
+
+
+export function getDayNameByIndex(dayIndex: number) {
+    const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    return days[dayIndex]
+}

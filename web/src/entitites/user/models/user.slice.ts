@@ -8,13 +8,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import styles
 import { AxiosError } from "axios";
 import { LoginUserPayload, RegisterUserPayload } from "../types/user.payload";
-
-export interface HabitData {
-  id: number;
-  name: string;
-  max_streak: number;
-  streak: number;
-}
+import { HabitData } from "../../habit/models/habit.slice";
 
 export interface MasteryData {
   id: number;
@@ -38,6 +32,7 @@ export interface UserState {
   status: "loading" | "idle" | "failed";
   token: string | null;
   isAuthenticated: boolean;
+  createdAt: string;
 }
 
 const initialState: UserState = {
@@ -49,6 +44,7 @@ const initialState: UserState = {
   status: "idle",
   token: localStorage.getItem("token") || null,
   isAuthenticated: !!localStorage.getItem("token"),
+  createdAt: "",
 };
 // САНКА
 
@@ -116,6 +112,7 @@ export const userSlice = createSlice({
       state.email = initialState.email;
       state.habits = initialState.habits;
       state.status = initialState.status;
+      state.createdAt = initialState.createdAt;
       state.isAuthenticated = false;
       state.token = null;
       localStorage.removeItem("token");
@@ -129,6 +126,7 @@ export const userSlice = createSlice({
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.level = action.payload.user.level;
+        state.createdAt = action.payload.user.createdAt;
         state.token = action.payload.token;
         state.status = action.payload.status;
         state.isAuthenticated = true;
@@ -144,9 +142,7 @@ export const userSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         state.email = action.payload.user.email;
-        state.level = action.payload.user.level;
         state.token = action.payload.token;
-        state.habits = action.payload.user.habits;
         state.status = "idle";
         state.isAuthenticated = true;
         localStorage.setItem("token", action.payload.token);
@@ -158,6 +154,7 @@ export const userSlice = createSlice({
       .addCase(checkUser.fulfilled, (state, action) => {
         state.status = "idle";
         state.email = action.payload.user.email;
+        state.createdAt = action.payload.user.createdAt;
         state.habits = action.payload.user.habits;
         state.level = action.payload.user.level;
         state.achievements = action.payload.user.achievements;

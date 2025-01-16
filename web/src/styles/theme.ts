@@ -9,7 +9,7 @@ const theme = createTheme({
       main: "#f5f5f5", // Light gray for contrast
     },
     background: {
-      default: "#2c3e50", // Background similar to `gray.700`
+      default: "#E8F9FF", // Background similar to `gray.700`
       paper: "#34495e", // Slightly lighter shade for cards
     },
     text: {

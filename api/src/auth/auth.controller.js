@@ -1,6 +1,12 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
-const { User, Habit, Level, UserAchievement, Mastery } = require("../../db/models");
+const {
+  User,
+  Habit,
+  Level,
+  UserAchievement,
+  Mastery,
+} = require("../../db/models");
 
 const register = async (req, res) => {
   const { username, email, password } = req.body;
@@ -37,7 +43,6 @@ const register = async (req, res) => {
         id: newUser.id,
         username: newUser.username,
         email: newUser.email,
-        levelId: newUser.levelId, // zamenit na levelId i na newUser.levelId
       },
     });
   } catch (error) {
@@ -52,7 +57,6 @@ const login = async (req, res) => {
   try {
     const user = await User.findOne({
       where: { email },
-      include: [Habit],
     });
 
     if (!user) {
@@ -83,8 +87,6 @@ const login = async (req, res) => {
         id: user.id,
         username: user.username,
         email: user.email,
-        levelId: user.levelId, // zamenit na levelId oba
-        habits: user.Habit,
       },
     });
   } catch (error) {
@@ -104,8 +106,8 @@ async function checkUser(req, res) {
         { model: Level },
         {
           model: UserAchievement,
-          include: [{ model: Mastery}, {model: Habit}],
-          attributes: ["userId", "habitId", "createdAt"] 
+          include: [{ model: Mastery }, { model: Habit }],
+          attributes: ["userId", "habitId", "createdAt"],
         },
       ],
     });
@@ -122,6 +124,7 @@ async function checkUser(req, res) {
         roleId: user.roleId,
         habits: user.Habits,
         achievements: user.UserAchievements,
+        createdAt: user.createdAt,
       },
     });
   } catch (error) {

@@ -8,8 +8,9 @@ import { Link } from "react-router-dom";
 import { RouterPath } from "../../router/pathes";
 import { useDispatch } from "react-redux";
 import { logout } from "../../../../entitites/user/models/user.slice"; // Adjust the path accordingly
-import { Modal, TextField } from "@mui/material";
+
 import { useState } from "react";
+import HabitModal from "../habitModal/habitModal.component";
 
 function NavBar() {
   const dispatch = useDispatch();
@@ -23,7 +24,7 @@ function NavBar() {
 
   return (
     <>
-      <AppBar position="static">
+      <AppBar position="static" sx={{height: "6%"}}>
         <Container maxWidth="xl">
           <Toolbar disableGutters>
             <Box
@@ -62,56 +63,7 @@ function NavBar() {
           </Toolbar>
         </Container>
       </AppBar>
-
-      {/* Modal for Adding Habit */}
-      <Modal
-        open={open}
-        onClose={handleModalClose}
-        aria-labelledby="add-habit-modal"
-        aria-describedby="add-habit-modal-description"
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            borderRadius: 2,
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
-          }}
-        >
-          <Typography id="add-habit-modal" variant="h6" component="h2">
-            Add New Habit
-          </Typography>
-          <TextField
-            label="Habit Name"
-            placeholder="Habit name"
-            fullWidth
-            variant="outlined"
-          />
-          <TextField
-            label="Description"
-            placeholder="Description"
-            fullWidth
-            variant="outlined"
-            multiline
-            rows={2}
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleModalClose}
-          >
-            Add Habit
-          </Button>
-        </Box>
-      </Modal>
+      <HabitModal open={open} onClose={handleModalClose} title="Add" />
     </>
   );
 }
