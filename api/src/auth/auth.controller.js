@@ -103,7 +103,6 @@ async function checkUser(req, res) {
       where: { id: userId },
       include: [
         { model: Habit },
-        { model: Level },
         {
           model: UserAchievement,
           include: [{ model: Mastery }, { model: Habit }],
@@ -112,14 +111,18 @@ async function checkUser(req, res) {
       ],
     });
 
-    console.log("user data: ", user);
+    const levels = await Level.findAll({
+      order: [["breakpoint", "DESC"]],
+    });
+    const userLevel = getLevelByXP(levels, user.xp);
+    console.log("User level: ", userLevel);
     // Respond with user info or a success message
     return res.status(200).json({
       message: "User is authenticated",
       user: {
         username: user.username,
         email: user.email,
-        level: user.Level, // zamenit na levelId oba
+        level: userLevel, // zamenit na levelId oba
         xp: user.xp,
         roleId: user.roleId,
         habits: user.Habits,
@@ -131,6 +134,11 @@ async function checkUser(req, res) {
     console.error("Token verification failed:", error);
     return res.status(401).json({ message: "Invalid or expired token" });
   }
+}
+
+function getLevelByXP(levels, xp) {
+  const result = levels.find((l) => xp >= l.breakpoint);
+  return result.id;
 }
 
 module.exports = { register, login, checkUser };

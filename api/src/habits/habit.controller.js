@@ -1,4 +1,12 @@
-const { Habit, UserAchievement, sequelize } = require("../../db/models");
+const { where } = require("sequelize");
+const {
+  User,
+  Habit,
+  UserAchievement,
+  Mastery,
+  sequelize,
+} = require("../../db/models");
+const habit = require("../../db/models/habit");
 
 async function getHabits(req, res) {
   try {
@@ -85,7 +93,7 @@ async function updateHabit(req, res) {
 
 async function deleteHabit(req, res) {
   const { id } = req.body;
-  console.log(id)
+  console.log(id);
 
   try {
     const oldHabit = await Habit.findOne({
@@ -97,7 +105,10 @@ async function deleteHabit(req, res) {
     }
 
     await sequelize.transaction(async (t) => {
-      await UserAchievement.destroy({ where: { habitId: id } }, { transaction: t });
+      await UserAchievement.destroy(
+        { where: { habitId: id } },
+        { transaction: t }
+      );
       await Habit.destroy({ where: { id } }, { transaction: t });
     });
 
@@ -113,4 +124,128 @@ async function deleteHabit(req, res) {
   }
 }
 
-module.exports = { getHabits, createHabit, updateHabit, deleteHabit };
+async function completeHabit(req, res) {
+  const { id } = req.body;
+  const userId = req.userId;
+
+  try {
+    const targetHabit = await Habit.findOne({
+      where: { id },
+    });
+
+    const user = await User.findOne({
+      where: { id: userId },
+    });
+
+    if (!targetHabit) {
+      return res.status(404).json({ message: "Habit not found" });
+    }
+
+    const result = canCompleted(targetHabit.lastCompletion);
+    console.log(result);
+    if (!result.success) {
+      return res.status(404).json({ message: result.message });
+    }
+
+    const newHabitData = calculateStreak(targetHabit);
+
+    const masteries = await Mastery.findAll({
+      order: [["streak_target", "DESC"]],
+    });
+    const achievementData = checkAchievement(
+      masteries,
+      newHabitData.max_streak
+    );
+
+    // console.log("New habit data: ", newHabitData);
+    let newAchievement;
+    await sequelize.transaction(async (t) => {
+      await Habit.update(newHabitData, { where: { id } });
+
+      await User.update({ xp: user.xp + 20 }, { where: { id: userId } });
+
+      if (achievementData) {
+        newAchievement = await UserAchievement.create({
+          userId,
+          habitId: id,
+          ...achievementData,
+        });
+      }
+    });
+
+    return res.status(201).json({
+      message: "Successfully completed habit",
+      achievement: {
+        ...newAchievement,
+      },
+    });
+  } catch (error) {
+    console.error("Error deleting habbit", error);
+    return res.status(500).json({ message: "Error deleting habbit" });
+  }
+}
+
+//Habit controller util functions
+function canCompleted(lastCompletion) {
+  const currentDate = new Date();
+
+  const difference = currentDate - lastCompletion;
+
+  console.log("Last completion: ", lastCompletion);
+  console.log("Current date: ", currentDate);
+  console.log("The date difference: ", difference);
+
+  if (difference < 86400000) {
+    return { success: false, message: "Can be completed only once a day" };
+  }
+
+  return { success: true };
+}
+
+function calculateStreak(habit) {
+  let { streak, max_streak, lastCompletion, everyday } = habit;
+  const currentDate = new Date();
+  const difference = currentDate - lastCompletion;
+
+  if (everyday) {
+    if (everyday && difference >= 172800000) {
+      streak = 0;
+    }
+  } else {
+    const daysBetween = [];
+    const totalDays = 7;
+    // console.log("Last completion day: ", lastCompletion.getDay() + 1);
+    // console.log("Current date day: ", currentDate.getDay());
+    let i = lastCompletion.getDay() + 1;
+    while (i !== currentDate.getDay()) {
+      daysBetween.push(i);
+      i = (i + 1) % totalDays;
+    }
+    // console.log("Days between: ", daysBetween);
+
+    if (habit.days.some((d) => daysBetween.includes(d))) {
+      streak = 0;
+    }
+  }
+
+  return {
+    streak: streak + 1,
+    max_streak: streak + 1 > max_streak ? streak + 1 : max_streak,
+    lastCompletion: new Date(),
+  };
+}
+
+function checkAchievement(masteries, max_streak) {
+  const result = masteries.find((m) => m.streak_target === max_streak);
+  if (result) {
+    return { masteryId: result.id };
+  }
+}
+
+module.exports = {
+  getHabits,
+  createHabit,
+  updateHabit,
+  deleteHabit,
+  completeHabit,
+};

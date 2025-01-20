@@ -18,11 +18,12 @@ interface HabitProps {
     achievements: AchievementData[]
     editHandler: (habit: HabitData) => void
     deleteHandler: (id: number) => void
+    completeHandler: (id: number) => void
 }
 
 const masteryImages = [Bronze, Silver, Gold]
 
-function Habit({ habit, achievements, editHandler, deleteHandler }: HabitProps) {
+function Habit({ habit, achievements, editHandler, deleteHandler, completeHandler }: HabitProps) {
     const habitMasteries = achievements.filter(a => a.Habit.id === habit.id).sort((a, b) => a.Mastery.streak_target - b.Mastery.streak_target)
     return (
         <Card sx={{ boxShadow: 2, padding: 2 }}>
@@ -50,7 +51,7 @@ function Habit({ habit, achievements, editHandler, deleteHandler }: HabitProps) 
                     <Button variant="outlined" color="error" size="small" onClick={() => deleteHandler(habit.id)}>
                         Delete
                     </Button>
-                    <Button variant="contained" color="primary" size="small" onClick={() => console.log("Completing")}>
+                    <Button variant="contained" color="primary" size="small" onClick={() => completeHandler(habit.id)}>
                         Complete
                     </Button>
                 </Stack>

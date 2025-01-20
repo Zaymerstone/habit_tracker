@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from "../../../app/shared/hooks/redux"
 import Habit from "../../../app/shared/components/habit/habit.component";
 import Achievement from "../../../app/shared/components/achievement/achievement.component";
 import { useState } from "react";
-import { deleteHabit, HabitData } from "../../../entitites/habit/models/habit.slice";
+import { completeHabit, deleteHabit, HabitData } from "../../../entitites/habit/models/habit.slice";
 import HabitModal from "../../../app/shared/components/habitModal/habitModal.component";
 import { checkUser } from "../../../entitites/user/models/user.slice";
 
@@ -35,6 +35,15 @@ export default function HomePage() {
       dispatch(checkUser()).unwrap();
     } catch (error) {
       console.error("Error deleting habit or checking user:", error);
+    }
+  };
+
+  const handleCompleteHabit = async (id: number) => {
+    try {
+      await dispatch(completeHabit(id)).unwrap();
+      dispatch(checkUser()).unwrap();
+    } catch (error) {
+      console.error("Error completing habit or checking user:", error);
     }
   };
 
@@ -71,7 +80,7 @@ export default function HomePage() {
           gap: 2,
         }}>
           {habits.map((habit) => (
-            <Habit habit={habit} achievements={achievements} key={habit.id} editHandler={handleEditHabit} deleteHandler={handleDeleteHabit} />
+            <Habit habit={habit} achievements={achievements} key={habit.id} editHandler={handleEditHabit} deleteHandler={handleDeleteHabit} completeHandler={handleCompleteHabit} />
           ))}
         </Box>
       </Box>

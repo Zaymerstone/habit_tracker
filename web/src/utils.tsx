@@ -10,6 +10,6 @@ export function formatDate(dateString: string) {
 
 
 export function getDayNameByIndex(dayIndex: number) {
-    const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    const days = [ "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
     return days[dayIndex]
 }

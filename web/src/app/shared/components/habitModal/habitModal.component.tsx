@@ -4,7 +4,7 @@ import { CreateHabitPayload, UpdateHabitPayload } from "../../../../entitites/ha
 import { useAppDispatch } from "../../hooks/redux";
 import { createHabit, HabitData, updateHabit } from "../../../../entitites/habit/models/habit.slice";
 import { checkUser } from "../../../../entitites/user/models/user.slice";
-import { AsyncThunkAction } from "@reduxjs/toolkit";
+import { getDayNameByIndex } from "../../../../utils";
 
 interface HabitModalProps {
     habit?: HabitData;
@@ -147,7 +147,7 @@ function HabitModal({ habit, title, open, onClose }: HabitModalProps) {
                         >
                             {weekDaysIndexes?.map((d) => (
                                 <ToggleButton value={d} key={d}>
-                                    <Typography>{d + 1}</Typography>
+                                    <Typography fontSize={10}>{getDayNameByIndex(d)}</Typography>
                                 </ToggleButton>
                             ))}
                         </ToggleButtonGroup>

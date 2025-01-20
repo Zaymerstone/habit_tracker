@@ -81,3 +81,28 @@ export const deleteHabit = createAsyncThunk(
     }
   }
 );
+
+export const completeHabit = createAsyncThunk(
+  "habit/complete",
+  async (id: number, { rejectWithValue }) => {
+    try {
+      const response = await tokenizedAxiosInstance.post(
+        ApiPath.CompleteHabit,
+        { id }
+      );
+
+      // Display a success toast
+      toast.success("Habit completed successfully!");
+
+      if (Object.keys(response.data.achievement).length > 0) {
+        toast.success("Wow, got new achievement!");
+      }
+
+      return response.data;
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        return rejectWithValue(error.response?.data);
+      }
+    }
+  }
+);

@@ -10,4 +10,6 @@ export enum ApiPath {
   UpdateHabit = "/habits/update",
   
   DeleteHabit = "/habits/delete",
+
+  CompleteHabit = "/habits/complete",
 }
