@@ -7,7 +7,10 @@ import { ApiPath } from "../../../app/api/pathes";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import styles
 import { AxiosError } from "axios";
-import { LoginUserPayload, RegisterUserPayload } from "../types/user.payload";
+import {
+  LoginUserPayload,
+  RegisterUserPayload,
+} from "../types/user.payload";
 import { HabitData } from "../../habit/models/habit.slice";
 
 export interface MasteryData {
@@ -26,6 +29,7 @@ export interface AchievementData {
 export interface UserState {
   email: string;
   level: number;
+  image: string;
   habits: HabitData[];
   achievements: AchievementData[];
   error: string | null;
@@ -38,6 +42,7 @@ export interface UserState {
 const initialState: UserState = {
   email: "",
   level: 0,
+  image: "",
   habits: [],
   achievements: [],
   error: null,
@@ -72,6 +77,29 @@ export const checkUser = createAsyncThunk(
   async (_, { rejectWithValue, dispatch }) => {
     try {
       const response = await tokenizedAxiosInstance.get(ApiPath.CheckUser);
+      return response.data;
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        if (error.response && error.response.status === 401) {
+          dispatch(logout());
+        }
+        return rejectWithValue(error.response?.data);
+      }
+    }
+  }
+);
+// THUNK CHECK USER
+export const changeAvatar = createAsyncThunk(
+  "user/changeAvatar",
+  async (AvatarData: FormData, { rejectWithValue, dispatch }) => {
+    try {
+      const response = await tokenizedAxiosInstance.post(
+        ApiPath.СhangeAvatar,
+        AvatarData
+      );
+
+      toast.success(`Uploaded new picture successfuly!`);
+
       return response.data;
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
@@ -158,6 +186,7 @@ export const userSlice = createSlice({
         state.habits = action.payload.user.habits;
         state.level = action.payload.user.level;
         state.achievements = action.payload.user.achievements;
+        state.image = action.payload.user.image;
       });
   },
 });

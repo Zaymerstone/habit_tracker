@@ -5,6 +5,8 @@ export enum ApiPath {
 
   CheckUser = "/auth/checkUser",
 
+  СhangeAvatar = "/auth/changeAvatar",
+
   CreateHabit = "/habits/create",
 
   UpdateHabit = "/habits/update",

@@ -126,6 +126,7 @@ async function checkUser(req, res) {
         xp: user.xp,
         roleId: user.roleId,
         habits: user.Habits,
+        image: user.image,
         achievements: user.UserAchievements,
         createdAt: user.createdAt,
       },
@@ -136,9 +137,38 @@ async function checkUser(req, res) {
   }
 }
 
+async function changeAvatar(req, res) {
+  const userId = req.userId;
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const user = await User.findOne({
+      where: { id: userId },
+    });
+
+    const imageUrl = `${req.protocol}://${req.get("host")}/uploads/${
+      req.file.filename
+    }`;
+
+    await User.update({ image: imageUrl }, { where: { id: userId } });
+
+    res.status(200).json({
+      message: "File uploaded successfully",
+      file: req.file,
+      userId: req.userId, // User data attached by the auth middleware
+    });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+}
+
+//Util function for auth router
+
 function getLevelByXP(levels, xp) {
   const result = levels.find((l) => xp >= l.breakpoint);
   return result.id;
 }
 
-module.exports = { register, login, checkUser };
+module.exports = { register, login, checkUser, changeAvatar };

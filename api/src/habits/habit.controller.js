@@ -207,7 +207,7 @@ function calculateStreak(habit) {
   const currentDate = new Date();
   const difference = currentDate - lastCompletion;
 
-  if (everyday) {
+  if (everyday || !lastCompletion) {
     if (everyday && difference >= 172800000) {
       streak = 0;
     }
