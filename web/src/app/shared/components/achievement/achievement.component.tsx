@@ -4,10 +4,9 @@ import {
     Card,
     Typography,
 } from "@mui/material";
-
-import Bronze from "../../../assets/bronze.png";
-import Silver from "../../../assets/silver.png";
-import Gold from "../../../assets/gold.png";
+import Bronze from "../../../../assets/bronze.png"
+import Silver from "../../../../assets/silver.png"
+import Gold from "../../../../assets/gold.png"
 import { AchievementData } from "../../../../entitites/user/models/user.slice";
 import { formatDate } from "../../../../utils";
 
@@ -18,6 +17,7 @@ interface AchievementProps {
 const masteryImages = [Bronze, Silver, Gold]
 
 function Achievement({ achievement }: AchievementProps) {
+    console.log(achievement)
     return (
         <Card
             sx={{
@@ -30,7 +30,7 @@ function Achievement({ achievement }: AchievementProps) {
             }}
         >
             <Avatar sx={{ backgroundColor: "#1976d2", width: 50, height: 50 }}>
-                <img width={40} height={40} src={masteryImages[achievement.Mastery.id - 1]} />
+                <img width={40} height={40} src={masteryImages[achievement.Mastery.id - 1]} alt="Mastery"/>
             </Avatar>
             <Box>
                 <Typography variant="body1" sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>

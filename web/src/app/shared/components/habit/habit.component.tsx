@@ -7,9 +7,9 @@ import {
     Typography,
 } from "@mui/material";
 import { AchievementData } from "../../../../entitites/user/models/user.slice";
-import Bronze from "../../../assets/bronze.png";
-import Silver from "../../../assets/silver.png";
-import Gold from "../../../assets/gold.png";
+import Bronze from "../../../../assets/bronze.png"
+import Silver from "../../../../assets/silver.png"
+import Gold from "../../../../assets/gold.png"
 import { HabitData } from "../../../../entitites/habit/models/habit.slice";
 import { formatDate, getDayNameByIndex } from "../../../../utils";
 
@@ -22,6 +22,7 @@ interface HabitProps {
 }
 
 const masteryImages = [Bronze, Silver, Gold]
+console.log(masteryImages)
 
 function Habit({ habit, achievements, editHandler, deleteHandler, completeHandler }: HabitProps) {
     const habitMasteries = achievements.filter(a => a.Habit.id === habit.id).sort((a, b) => a.Mastery.streak_target - b.Mastery.streak_target)

@@ -154,7 +154,7 @@ async function completeHabit(req, res) {
     });
     const achievementData = checkAchievement(
       masteries,
-      newHabitData.max_streak
+      newHabitData.streak
     );
 
     // console.log("New habit data: ", newHabitData);
@@ -203,40 +203,57 @@ function canCompleted(lastCompletion) {
 }
 
 function calculateStreak(habit) {
-  let { streak, max_streak, lastCompletion, everyday } = habit;
+  let { streak, max_streak, lastCompletion, everyday, days } = habit;
   const currentDate = new Date();
-  const difference = currentDate - lastCompletion;
+  
+  if (!lastCompletion) {
+    // No previous completion means no streak
+    return { streak: 1, max_streak: 1, lastCompletion: new Date()};
+  }
 
-  if (everyday || !lastCompletion) {
-    if (everyday && difference >= 172800000) {
-      streak = 0;
+  const difference = currentDate - lastCompletion;
+  const oneDayMs = 86400000; // 24 hours in milliseconds
+
+  if (everyday) {
+    if (difference >= oneDayMs * 2) {
+      streak = 0; // Reset streak if more than 2 days gap
+    } else {
+      streak += 1;
+      max_streak = Math.max(max_streak, streak);
     }
   } else {
-    const daysBetween = [];
-    const totalDays = 7;
-    // console.log("Last completion day: ", lastCompletion.getDay() + 1);
-    // console.log("Current date day: ", currentDate.getDay());
-    let i = lastCompletion.getDay() + 1;
-    while (i !== currentDate.getDay()) {
-      daysBetween.push(i);
-      i = (i + 1) % totalDays;
-    }
-    // console.log("Days between: ", daysBetween);
+    const lastCompletionDay = lastCompletion.getDay(); // 0 (Sunday) - 6 (Saturday)
+    const currentDay = currentDate.getDay(); 
 
-    if (habit.days.some((d) => daysBetween.includes(d))) {
-      streak = 0;
+    const daysBetween = [];
+    let i = (lastCompletionDay + 1) % 7;
+    
+    // Collect all days between lastCompletion and today
+    while (i !== currentDay) {
+      daysBetween.push(i);
+      i = (i + 1) % 7;
+    }
+
+    // Check if any missing days were supposed to be done
+    if (days.some((d) => daysBetween.includes(d))) {
+      streak = 0; // Break streak if any required day was skipped
+    } else {
+      const weekDifference = Math.floor(difference / (7 * oneDayMs));
+      if (weekDifference > 0) {
+        streak = 0; // More than a week passed, reset streak
+      } else {
+        streak += 1;
+        max_streak = Math.max(max_streak, streak);
+      }
     }
   }
 
-  return {
-    streak: streak + 1,
-    max_streak: streak + 1 > max_streak ? streak + 1 : max_streak,
-    lastCompletion: new Date(),
-  };
+  return { streak, max_streak, lastCompletion: new Date() };
 }
 
-function checkAchievement(masteries, max_streak) {
-  const result = masteries.find((m) => m.streak_target === max_streak);
+
+function checkAchievement(masteries, streak) {
+  const result = masteries.find((m) => m.streak_target === streak);
   if (result) {
     return { masteryId: result.id };
   }

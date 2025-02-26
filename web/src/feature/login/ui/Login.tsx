@@ -3,10 +3,11 @@ import {
   Button,
   FormControl,
   FormLabel,
-  Link,
+  Link as MuiLink,
   TextField,
   Typography,
 } from "@mui/material";
+import { Link } from "react-router-dom";
 import { useAppDispatch } from "../../../app/shared/hooks/redux";
 import { loginUser } from "../../../entitites/user/models/user.slice.ts";
 import { LoginUserPayload } from "../../../entitites/user/types/user.payload";
@@ -56,13 +57,13 @@ export default function Login() {
           <FormControl>
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
               <FormLabel>Password</FormLabel>
-              <Link
+              <MuiLink
                 component="button"
                 type="button"
                 sx={{ alignSelf: "baseline" }}
               >
                 Forgot Password?
-              </Link>
+              </MuiLink>
             </Box>
             <TextField
               id="password"
@@ -85,8 +86,10 @@ export default function Login() {
           </Button>
           <Typography sx={{ textAlign: "center" }}>
             No account?
-            <Link sx={{ alignSelf: "center" }} type="button" component="button">
-              Sign up
+            <Link to={"/register"}>            
+              <MuiLink sx={{ alignSelf: "center" }} type="button" component="button">
+                Sign up
+              </MuiLink>
             </Link>
           </Typography>
         </Box>

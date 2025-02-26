@@ -3,10 +3,11 @@ import {
   Button,
   FormControl,
   FormLabel,
-  Link,
+  Link as MuiLink,
   TextField,
   Typography,
 } from "@mui/material";
+import { Link } from "react-router-dom";
 import { useAppDispatch } from "../../../app/shared/hooks/redux";
 import { registerUser } from "../../../entitites/user/models/user.slice";
 import { RegisterUserPayload } from "../../../entitites/user/types/user.payload";
@@ -85,8 +86,10 @@ export default function Register() {
           </Button>
           <Typography sx={{ textAlign: "center" }}>
             Already have an account?
-            <Link sx={{ alignSelf: "center" }} type="button" component="button">
-              Sign in
+            <Link to={"/login"}>
+              <MuiLink sx={{ alignSelf: "center" }} type="button" component="button">
+                Sign in
+              </MuiLink>
             </Link>
           </Typography>
         </Box>
