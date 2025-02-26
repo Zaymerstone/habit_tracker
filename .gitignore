@@ -1,3 +1,6 @@
 .env
 # Ignore node_modules folders in all directories
 **/node_modules
+
+**/uploads/*
+**/!uploads/.gitkeep

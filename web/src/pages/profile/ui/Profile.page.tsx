@@ -15,7 +15,8 @@ export default function ProfilePage() {
   const user = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
 
-  const habitWithHighestStreak = Math.max(...user.habits.map((h) => (h.max_streak)))
+  const habitsSteaks = user.habits.map((h) => (h.max_streak))
+  const habitWithHighestStreak = Math.max(...habitsSteaks, 0)
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [uploadPicture, setUploadPicture] = useState<File | null>(null);

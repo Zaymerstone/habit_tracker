@@ -28,6 +28,7 @@ const register = async (req, res) => {
       password_hash: hashpass,
       roleId: 1,
       levelId: 1, // zamenit na levelId i na 1
+      xp: 0
     });
 
     // Generate token for the new user
@@ -168,7 +169,7 @@ async function changeAvatar(req, res) {
 
 function getLevelByXP(levels, xp) {
   const result = levels.find((l) => xp >= l.breakpoint);
-  return result.id;
+  return result ? result.id : 0;
 }
 
 module.exports = { register, login, checkUser, changeAvatar };

@@ -4,6 +4,7 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.bulkInsert("Levels", [
+      { id: 0, breakpoint: 0, createdAt: new Date(), updatedAt: new Date() },
       { id: 1, breakpoint: 15, createdAt: new Date(), updatedAt: new Date() },
       { id: 2, breakpoint: 30, createdAt: new Date(), updatedAt: new Date() },
       { id: 3, breakpoint: 45, createdAt: new Date(), updatedAt: new Date() },

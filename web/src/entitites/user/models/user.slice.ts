@@ -153,11 +153,12 @@ export const userSlice = createSlice({
         state.status = "loading";
       })
       .addCase(registerUser.fulfilled, (state, action) => {
-        state.level = action.payload.user.level;
-        state.createdAt = action.payload.user.createdAt;
+        state.email = action.payload.user.email;
         state.token = action.payload.token;
-        state.status = action.payload.status;
+        state.status = "idle";
         state.isAuthenticated = true;
+        // state.level = action.payload.user.level;
+        // state.createdAt = action.payload.user.createdAt;
         localStorage.setItem("token", action.payload.token);
       })
       .addCase(registerUser.rejected, (state, action) => {
