@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const path = require('path');
 const { authRouter } = require("./auth/auth.routes");
 const { habitRouter } = require("./habits/habit.routes");
+const { statisticsRouter } = require("./statistics/statistics.routes");
 const app = express(); // экземпляр приложения we can define routes, middleware, settings using app
 app.use(
   cors({
@@ -18,4 +19,5 @@ app.use(express.json()); // parse data in json
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use("/auth", authRouter);
 app.use("/habits", habitRouter);
+app.use("/statistics", statisticsRouter);
 app.listen(3000);

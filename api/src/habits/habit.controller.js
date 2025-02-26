@@ -1,12 +1,11 @@
-const { where } = require("sequelize");
 const {
   User,
   Habit,
   UserAchievement,
+  CompletedHabit,
   Mastery,
   sequelize,
 } = require("../../db/models");
-const habit = require("../../db/models/habit");
 
 async function getHabits(req, res) {
   try {
@@ -105,6 +104,10 @@ async function deleteHabit(req, res) {
     }
 
     await sequelize.transaction(async (t) => {
+      await CompletedHabit.destroy(
+        { where: { habitId: id } },
+        { transaction: t }
+      );
       await UserAchievement.destroy(
         { where: { habitId: id } },
         { transaction: t }
@@ -171,6 +174,11 @@ async function completeHabit(req, res) {
           ...achievementData,
         });
       }
+
+      await CompletedHabit.create({
+        userId,
+        habitId: id
+      });
     });
 
     return res.status(201).json({
