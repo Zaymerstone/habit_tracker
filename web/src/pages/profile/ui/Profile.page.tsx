@@ -11,6 +11,7 @@ import { formatDate } from "../../../utils";
 import { useState } from "react";
 import { changeAvatar, checkUser } from "../../../entitites/user/models/user.slice";
 import HabitCompletedChart from "../../../app/shared/components/statistics/habitCompletedChart.component";
+import HabitActiveUsersChart from "../../../app/shared/components/statistics/habitActiveUsersChart.component";
 
 export default function ProfilePage() {
   const user = useAppSelector((state) => state.user);
@@ -111,8 +112,7 @@ export default function ProfilePage() {
         gap: 4
       }}>
         <HabitCompletedChart habits={habits} />
-        <HabitCompletedChart habits={habits} />
-        <HabitCompletedChart habits={habits} />
+        <HabitActiveUsersChart/>
       </Box>
     </Box>
   );

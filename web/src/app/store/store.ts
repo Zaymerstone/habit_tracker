@@ -1,10 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import userReducer from "../../entitites/user/models/user.slice";
 import personalStatisticsReducer from "../../entitites/statistics/models/statistics.slice"
+import userActivityStatisticsReducer from "../../entitites/statistics/models/active_statistics.slice"
 export const store = configureStore({
   reducer: {
     user: userReducer,
     statistics: personalStatisticsReducer,
+    user_activity: userActivityStatisticsReducer,
   },
 });
 

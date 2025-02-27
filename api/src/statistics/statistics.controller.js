@@ -1,5 +1,6 @@
 const { CompletedHabit, Habit } = require("../../db/models");
 const { Op } = require("sequelize");
+const { format } = require("date-fns"); 
 
 async function getPersonalCompletionData(req, res) {
   try {
@@ -122,6 +123,111 @@ async function getPersonalCompletionData(req, res) {
   }
 }
 
+async function getUserActivity(req, res) {
+  try {
+    const { period } = req.query;
+
+    if (!["year", "month", "week", "day"].includes(period)) {
+      return res.status(400).json({ message: "Invalid period type" });
+    }
+
+    let startDate;
+    let breakpoints = [];
+    let dateFormat;
+
+    if (period === "year") {
+      // Start date is exactly 365 days ago
+      startDate = new Date();
+      startDate.setDate(startDate.getDate() - 365);
+      dateFormat = "d MMM";
+      // Breakpoints: First day of each month for the last 12 months
+      for (let i = 11; i >= 0; i--) {
+        let month = new Date();
+        month.setMonth(month.getMonth() - i);
+        month.setDate(1);
+        month.setHours(0, 0, 0, 0);
+        breakpoints.push(month);
+      }
+    } else if (period === "month") {
+      // Start date is exactly 30 days ago
+      startDate = new Date();
+      startDate.setDate(startDate.getDate() - 30);
+      dateFormat = "d MMM";
+
+      // Breakpoints: Every 5th day in the last 30 days
+      for (let i = 30; i >= 0; i -= 5) {
+        let day = new Date();
+        day.setDate(day.getDate() - i);
+        day.setHours(0, 0, 0, 0);
+        breakpoints.push(day);
+      }
+    } else if (period === "week") {
+      // Start date is exactly 7 days ago
+      startDate = new Date();
+      startDate.setDate(startDate.getDate() - 7);
+      startDate.setHours(0, 0, 0, 0);
+      dateFormat = "d MMM";
+
+      // Breakpoints: Each day for the last 7 days
+      for (let i = 7; i >= 0; i--) {
+        let day = new Date();
+        day.setDate(day.getDate() - i);
+        day.setHours(0, 0, 0, 0);
+        breakpoints.push(day);
+      }
+    } else if (period === "day") {
+      // Start date is the beginning of the previous day
+      startDate = new Date();
+      startDate.setDate(startDate.getDate() - 1);
+      startDate.setHours(0, 0, 0, 0);
+      dateFormat = "h:mm a";
+
+      // Breakpoints: 00:00, 06:00, 12:00, 18:00
+      breakpoints = [
+        new Date(startDate),
+        new Date(startDate.setHours(6)),
+        new Date(startDate.setHours(12)),
+        new Date(startDate.setHours(18)),
+      ];
+    }
+
+    // Fetch completed habits within the selected time frame
+    const completions = await CompletedHabit.findAll({
+      where: { createdAt: { [Op.gte]: startDate } },
+      attributes: ["userId", "createdAt"],
+    });
+
+    // Process the data
+    const activityData = breakpoints.map((point, index) => {
+      const nextPoint = breakpoints[index + 1] || new Date();
+      const userHabitCounts = new Map(); // Stores habit count per user
+
+      completions.forEach(({ userId, createdAt }) => {
+        const date = new Date(createdAt);
+        if (date >= point && date < nextPoint) {
+          userHabitCounts.set(userId, (userHabitCounts.get(userId) || 0) + 1);
+        }
+      });
+
+      const activeUsers = userHabitCounts.size;
+      const totalHabitsCompleted = [...userHabitCounts.values()].reduce((sum, count) => sum + count, 0);
+      const avgHabitsPerUser = activeUsers > 0 ? totalHabitsCompleted / activeUsers : 0;
+
+      return {
+        datetime: format(point, dateFormat),
+        activeUsers,
+        avgHabitsPerUser: parseFloat(avgHabitsPerUser.toFixed(2)), // Round to 2 decimal places
+      };
+    });
+
+    return res.status(200).json(activityData);
+  } catch (error) {
+    console.error("Error fetching user activity:", error);
+    return res.status(500).json({ message: "Error fetching user activity" });
+  }
+}
+
 module.exports = {
   getPersonalCompletionData,
+  getUserActivity
 };
