@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from "../../../app/shared/hooks/redux"
 import { formatDate } from "../../../utils";
 import { useState } from "react";
 import { changeAvatar, checkUser } from "../../../entitites/user/models/user.slice";
+import HabitCompletedChart from "../../../app/shared/components/statistics/habitCompletedChart.component";
 
 export default function ProfilePage() {
   const user = useAppSelector((state) => state.user);
@@ -17,6 +18,8 @@ export default function ProfilePage() {
 
   const habitsSteaks = user.habits.map((h) => (h.max_streak))
   const habitWithHighestStreak = Math.max(...habitsSteaks, 0)
+
+  const habits = user.habits
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [uploadPicture, setUploadPicture] = useState<File | null>(null);
@@ -53,17 +56,19 @@ export default function ProfilePage() {
     <Box
       sx={{
         display: "flex",
-        justifyContent: "center",
+        flexDirection: "column",
+        justifyContent: "space-between",
         alignItems: "center",
-        height: "91%",
+        height: "100%",
         backgroundColor: "#E8F9FF", // Optional background color for the page
-        padding: 2,
+        padding: 4,
+        boxSizing: "border-box"
       }}
     >
       {/* Profile Card */}
       <Card
         sx={{
-          width: 400, // Set card width
+          width: 600, // Set card width
           padding: 3,
           boxShadow: 3,
           borderRadius: 2,
@@ -98,6 +103,17 @@ export default function ProfilePage() {
           </Box>
         </CardContent>
       </Card>
+
+      <Box sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        gap: 4
+      }}>
+        <HabitCompletedChart habits={habits} />
+        <HabitCompletedChart habits={habits} />
+        <HabitCompletedChart habits={habits} />
+      </Box>
     </Box>
   );
 }

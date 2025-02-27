@@ -14,4 +14,6 @@ export enum ApiPath {
   DeleteHabit = "/habits/delete",
 
   CompleteHabit = "/habits/complete",
+
+  PersonalCompletionData = "/statistics/get_personal_completion_data",
 }
