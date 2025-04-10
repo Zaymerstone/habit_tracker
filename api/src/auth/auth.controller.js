@@ -6,6 +6,8 @@ const {
   Level,
   UserAchievement,
   Mastery,
+  GlobalHabit,
+  UserGlobalHabit,
 } = require("../../db/models");
 
 const register = async (req, res) => {
@@ -28,8 +30,23 @@ const register = async (req, res) => {
       password_hash: hashpass,
       roleId: 1,
       levelId: 1, // zamenit na levelId i na 1
-      xp: 0
+      xp: 0,
     });
+
+    // Initialize global habits for the new user
+    const globalHabits = await GlobalHabit.findAll();
+
+    if (globalHabits.length > 0) {
+      const userGlobalHabits = globalHabits.map((habit) => ({
+        userId: newUser.id,
+        globalHabitId: habit.id,
+        streak: 0,
+        max_streak: 0,
+        lastCompletion: null,
+      }));
+
+      await UserGlobalHabit.bulkCreate(userGlobalHabits);
+    }
 
     // Generate token for the new user
     const token = jwt.sign({ id: newUser.id }, "your_jwt_secret", {
@@ -106,17 +123,45 @@ async function checkUser(req, res) {
         { model: Habit },
         {
           model: UserAchievement,
-          include: [{ model: Mastery }, { model: Habit }],
-          attributes: ["userId", "habitId", "createdAt"],
+          include: [
+            { model: Mastery },
+            { model: Habit },
+            { model: GlobalHabit },
+          ],
+          attributes: ["userId", "habitId", "globalHabitId", "createdAt"],
         },
       ],
     });
+
+    // Check if UserGlobalHabit is defined and accessible before including it
+    try {
+      user.UserGlobalHabits = await UserGlobalHabit.findAll({
+        where: { userId },
+        include: [{ model: GlobalHabit }],
+      });
+    } catch (err) {
+      console.log("Could not fetch UserGlobalHabits:", err.message);
+      user.UserGlobalHabits = [];
+    }
 
     const levels = await Level.findAll({
       order: [["breakpoint", "DESC"]],
     });
     const userLevel = getLevelByXP(levels, user.xp);
-    console.log("User level: ", userLevel);
+
+    // Format global habits for the response
+    const globalHabits =
+      user.UserGlobalHabits?.map((ugh) => ({
+        id: ugh.globalHabitId,
+        name: ugh.GlobalHabit?.name || "Unknown Habit",
+        days: ugh.GlobalHabit?.days || [],
+        everyday: ugh.GlobalHabit?.everyday || false,
+        streak: ugh.streak || 0,
+        max_streak: ugh.max_streak || 0,
+        lastCompletion: ugh.lastCompletion,
+        progressId: ugh.id,
+      })) || [];
+
     // Respond with user info or a success message
     return res.status(200).json({
       message: "User is authenticated",
@@ -127,6 +172,7 @@ async function checkUser(req, res) {
         xp: user.xp,
         roleId: user.roleId,
         habits: user.Habits,
+        globalHabits: globalHabits,
         image: user.image,
         achievements: user.UserAchievements,
         createdAt: user.createdAt,

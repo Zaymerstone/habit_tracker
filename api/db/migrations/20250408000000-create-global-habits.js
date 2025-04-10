@@ -2,35 +2,24 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("UserAchievements", {
+    await queryInterface.createTable("GlobalHabits", {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      userId: {
+      name: {
         allowNull: false,
-        type: Sequelize.INTEGER,
-        onDelete: "CASCADE",
-        references: {
-          model: "Users",
-          key: "id",
-        },
+        type: Sequelize.STRING,
       },
-      habitId: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: "Habits",
-          key: "id",
-        },
+      days: {
+        type: Sequelize.ARRAY(Sequelize.INTEGER),
+        defaultValue: [],
       },
-      masteryId: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: "Masteries",
-          key: "id",
-        },
+      everyday: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
       },
       createdAt: {
         allowNull: false,
@@ -43,6 +32,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable("UserAchievements");
+    await queryInterface.dropTable("GlobalHabits");
   },
 };

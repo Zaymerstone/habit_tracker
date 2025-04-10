@@ -7,10 +7,7 @@ import { ApiPath } from "../../../app/api/pathes";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import styles
 import { AxiosError } from "axios";
-import {
-  LoginUserPayload,
-  RegisterUserPayload,
-} from "../types/user.payload";
+import { LoginUserPayload, RegisterUserPayload } from "../types/user.payload";
 import { HabitData } from "../../habit/models/habit.slice";
 
 export interface MasteryData {
@@ -21,9 +18,22 @@ export interface MasteryData {
 
 export interface AchievementData {
   userId: number;
-  Habit: HabitData;
+  Habit?: HabitData;
+  GlobalHabit?: GlobalHabitData;
   Mastery: MasteryData;
   createdAt: string;
+}
+
+// Interface for global habits
+export interface GlobalHabitData {
+  id: number;
+  name: string;
+  days: number[];
+  everyday: boolean;
+  streak: number;
+  max_streak: number;
+  lastCompletion: string | null;
+  progressId: number;
 }
 
 export interface UserState {
@@ -31,6 +41,7 @@ export interface UserState {
   level: number;
   image: string;
   habits: HabitData[];
+  globalHabits: GlobalHabitData[]; // Add global habits
   achievements: AchievementData[];
   error: string | null;
   status: "loading" | "idle" | "failed";
@@ -44,6 +55,7 @@ const initialState: UserState = {
   level: 0,
   image: "",
   habits: [],
+  globalHabits: [], // Initialize global habits
   achievements: [],
   error: null,
   status: "idle",
@@ -139,6 +151,7 @@ export const userSlice = createSlice({
       state.level = initialState.level;
       state.email = initialState.email;
       state.habits = initialState.habits;
+      state.globalHabits = initialState.globalHabits;
       state.status = initialState.status;
       state.createdAt = initialState.createdAt;
       state.isAuthenticated = false;
@@ -185,6 +198,7 @@ export const userSlice = createSlice({
         state.email = action.payload.user.email;
         state.createdAt = action.payload.user.createdAt;
         state.habits = action.payload.user.habits;
+        state.globalHabits = action.payload.user.globalHabits || [];
         state.level = action.payload.user.level;
         state.achievements = action.payload.user.achievements;
         state.image = action.payload.user.image;

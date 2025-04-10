@@ -11,7 +11,8 @@ import { formatDate } from "../../../utils";
 import { useState } from "react";
 import { changeAvatar, checkUser } from "../../../entitites/user/models/user.slice";
 import HabitCompletedChart from "../../../app/shared/components/statistics/habitCompletedChart.component";
-import HabitActiveUsersChart from "../../../app/shared/components/statistics/habitActiveUsersChart.component";
+
+import GlobalHabitComparisonChart from "../../../app/shared/components/statistics/globalHabitComparisonChart.component";
 
 export default function ProfilePage() {
   const user = useAppSelector((state) => state.user);
@@ -58,6 +59,7 @@ export default function ProfilePage() {
       sx={{
         display: "flex",
         flexDirection: "column",
+        gap: 4,
         justifyContent: "space-between",
         alignItems: "center",
         height: "100%",
@@ -105,6 +107,7 @@ export default function ProfilePage() {
         </CardContent>
       </Card>
 
+
       <Box sx={{
         display: "flex",
         justifyContent: "center",
@@ -112,7 +115,7 @@ export default function ProfilePage() {
         gap: 4
       }}>
         <HabitCompletedChart habits={habits} />
-        <HabitActiveUsersChart/>
+        <GlobalHabitComparisonChart />
       </Box>
     </Box>
   );

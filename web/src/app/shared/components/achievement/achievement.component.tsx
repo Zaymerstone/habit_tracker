@@ -3,10 +3,15 @@ import {
     Box,
     Card,
     Typography,
+    Chip
 } from "@mui/material";
 import Bronze from "../../../../assets/bronze.png"
 import Silver from "../../../../assets/silver.png"
 import Gold from "../../../../assets/gold.png"
+import Platinum from "../../../../assets/platinum.png"
+import Diamond from "../../../../assets/diamond.png"
+import Master from "../../../../assets/master.png"
+
 import { AchievementData } from "../../../../entitites/user/models/user.slice";
 import { formatDate } from "../../../../utils";
 
@@ -14,10 +19,15 @@ interface AchievementProps {
     achievement: AchievementData
 }
 
-const masteryImages = [Bronze, Silver, Gold]
+const masteryImages = [Bronze, Silver, Gold, Platinum, Diamond, Master]
 
 function Achievement({ achievement }: AchievementProps) {
-    console.log(achievement)
+    // Determine if this is a global habit achievement
+    const isGlobalHabit = !!achievement.GlobalHabit;
+
+    // Get the habit name from either regular or global habit
+    const habitName = isGlobalHabit ? achievement.GlobalHabit?.name : achievement.Habit?.name;
+
     return (
         <Card
             sx={{
@@ -30,12 +40,21 @@ function Achievement({ achievement }: AchievementProps) {
             }}
         >
             <Avatar sx={{ backgroundColor: "#1976d2", width: 50, height: 50 }}>
-                <img width={40} height={40} src={masteryImages[achievement.Mastery.id - 1]} alt="Mastery"/>
+                <img width={40} height={40} src={masteryImages[achievement.Mastery.id - 1]} alt="Mastery" />
             </Avatar>
             <Box>
-                <Typography variant="body1" sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
-                    {achievement.Mastery.title}
-                </Typography>
+                <Box display="flex" alignItems="center" gap={1} mb={0.5}>
+                    <Typography variant="body1" sx={{ fontWeight: "bold", fontSize: "1.5rem" }}>
+                        {achievement.Mastery.title}
+                    </Typography>
+                    {isGlobalHabit && (
+                        <Chip
+                            label="Global"
+                            color="primary"
+                            size="small"
+                        />
+                    )}
+                </Box>
                 <Typography variant="body2" color="text.secondary">
                     <Typography component="span">
                         {"Was achieved for having streak of "}
@@ -47,7 +66,7 @@ function Achievement({ achievement }: AchievementProps) {
                         {" on "}
                     </Typography>
                     <Typography component="span" fontWeight={600} fontSize="1.2rem">
-                        {achievement.Habit.name}
+                        {habitName || "Unknown Habit"}
                     </Typography>
                 </Typography>
                 <Typography variant="body2" color="text.secondary" fontWeight={500} fontSize="1.1rem">

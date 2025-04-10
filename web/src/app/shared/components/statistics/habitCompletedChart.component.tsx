@@ -9,9 +9,10 @@ import {
     Tooltip,
     Legend,
 } from "chart.js";
-import { MenuItem, Select, FormControl, InputLabel, Box, CircularProgress } from "@mui/material";
+import { MenuItem, Select, FormControl, InputLabel, Box, CircularProgress, Tabs, Tab, Typography } from "@mui/material";
 import { fetchPersonalStatistics } from "../../../../entitites/statistics/models/statistics.slice";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
+import { GlobalHabitData } from "../../../../entitites/user/models/user.slice";
 
 // Register Chart.js components
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
@@ -29,8 +30,15 @@ type HabitCompletedChartProps = {
 const HabitCompletedChart = ({ habits }: HabitCompletedChartProps) => {
     const dispatch = useAppDispatch();
     const statistics = useAppSelector((state) => state.statistics);
+    const globalHabits = useAppSelector((state) => state.user.globalHabits);
     const [selectedHabit, setSelectedHabit] = useState<number | "">("");
     const [loading, setLoading] = useState<boolean>(false);
+    const [tabValue, setTabValue] = useState<number>(0);
+
+    const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+        setTabValue(newValue);
+        setSelectedHabit("");
+    };
 
     const handleHabitChange = (event: any) => {
         setSelectedHabit(event.target.value);
@@ -39,10 +47,13 @@ const HabitCompletedChart = ({ habits }: HabitCompletedChartProps) => {
     useEffect(() => {
         setLoading(true);
         if (selectedHabit) {
-            dispatch(fetchPersonalStatistics(Number(selectedHabit)));
+            dispatch(fetchPersonalStatistics({
+                habitId: Number(selectedHabit),
+                isGlobal: tabValue === 1
+            }));
         }
         setLoading(false);
-    }, [selectedHabit, dispatch]);
+    }, [selectedHabit, tabValue, dispatch]);
 
     // Prepare chart data
     const chartData = {
@@ -62,36 +73,64 @@ const HabitCompletedChart = ({ habits }: HabitCompletedChartProps) => {
     };
 
     return (
-        <Box sx={{width: 600, margin: "auto", textAlign: "center", boxShadow: 3, backgroundColor: "white", padding: 2, borderRadius: 3}}>
+        <Box sx={{ width: 600, height: 450, margin: "auto", textAlign: "center", boxShadow: 3, backgroundColor: "white", padding: 2, borderRadius: 3 }}>
+            <Typography variant="h6" mb={2}>Habit Completion Statistics</Typography>
+
+            {/* Tab Selection */}
+            <Tabs
+                value={tabValue}
+                onChange={handleTabChange}
+                centered
+                sx={{ mb: 2 }}
+                textColor="primary"
+                indicatorColor="primary"
+            >
+                <Tab label="Personal Habits" />
+                <Tab label="Global Habits" />
+            </Tabs>
+
             {/* Habit Selector */}
             <FormControl fullWidth sx={{ mb: 3 }}>
                 <InputLabel>Select Habit</InputLabel>
                 <Select value={selectedHabit} onChange={handleHabitChange}>
-                    {habits.map((habit) => (
-                        <MenuItem key={habit.id} value={habit.id}>
-                            {habit.name}
-                        </MenuItem>
-                    ))}
+                    {tabValue === 0 ? (
+                        // Personal habits
+                        habits.map((habit) => (
+                            <MenuItem key={habit.id} value={habit.id}>
+                                {habit.name}
+                            </MenuItem>
+                        ))
+                    ) : (
+                        // Global habits
+                        globalHabits.map((habit: GlobalHabitData) => (
+                            <MenuItem key={habit.id} value={habit.id}>
+                                {habit.name}
+                            </MenuItem>
+                        ))
+                    )}
                 </Select>
             </FormControl>
 
-            {/* Chart */}
-            {loading ? (
-                <CircularProgress />
-            ) : statistics.statistics ? (
-                <Bar
-                    data={chartData}
-                    options={{
-                        responsive: true,
-                        plugins: {
-                            title: { display: true, text: "Habit Completion Stats (Last 3 Months)" },
-                            legend: { position: "bottom" },
-                        },
-                    }}
-                />
-            ) : (
-                <p>Select a habit to view stats</p>
-            )}
+            {/* Chart container with fixed height */}
+            <Box sx={{ height: 280 }}>
+                {loading ? (
+                    <CircularProgress />
+                ) : statistics.statistics && statistics.statistics.length > 0 ? (
+                    <Bar
+                        data={chartData}
+                        options={{
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                title: { display: true, text: "Habit Completion Stats (Last 3 Months)" },
+                                legend: { position: "bottom" },
+                            },
+                        }}
+                    />
+                ) : (
+                    <Typography>Select a habit to view stats</Typography>
+                )}
+            </Box>
         </Box>
     );
 };

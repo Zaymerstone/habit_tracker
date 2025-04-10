@@ -3,19 +3,22 @@
 import {
   Box,
   Typography,
+  Divider,
+  Button
 } from "@mui/material";
 import theme from "../../../styles/theme";
 import { useAppDispatch, useAppSelector } from "../../../app/shared/hooks/redux";
 import Habit from "../../../app/shared/components/habit/habit.component";
 import Achievement from "../../../app/shared/components/achievement/achievement.component";
 import { useState } from "react";
-import { completeHabit, deleteHabit, HabitData } from "../../../entitites/habit/models/habit.slice";
+import { completeHabit, completeGlobalHabit, deleteHabit, HabitData } from "../../../entitites/habit/models/habit.slice";
 import HabitModal from "../../../app/shared/components/habitModal/habitModal.component";
 import { checkUser } from "../../../entitites/user/models/user.slice";
 
 export default function HomePage() {
   const dispatch = useAppDispatch();
   const habits = useAppSelector((state) => state.user.habits);
+  const globalHabits = useAppSelector((state) => state.user.globalHabits);
   const achievements = useAppSelector((state) => state.user.achievements);
   const [editHabit, setEditHabit] = useState<HabitData>();
 
@@ -44,6 +47,14 @@ export default function HomePage() {
       dispatch(checkUser()).unwrap();
     } catch (error) {
       console.error("Error completing habit or checking user:", error);
+    }
+  };
+
+  const handleCompleteGlobalHabit = async (id: number) => {
+    try {
+      await dispatch(completeGlobalHabit(id)).unwrap();
+    } catch (error) {
+      console.error("Error completing global habit:", error);
     }
   };
 
@@ -80,9 +91,41 @@ export default function HomePage() {
           gap: 2,
         }}>
           {habits.map((habit) => (
-            <Habit habit={habit} achievements={achievements} key={habit.id} editHandler={handleEditHabit} deleteHandler={handleDeleteHabit} completeHandler={handleCompleteHabit} />
+            <Habit
+              habit={habit}
+              achievements={achievements}
+              key={habit.id}
+              editHandler={handleEditHabit}
+              deleteHandler={handleDeleteHabit}
+              completeHandler={handleCompleteHabit}
+              isGlobal={false}
+            />
           ))}
         </Box>
+
+        {globalHabits && globalHabits.length > 0 && (
+          <>
+            <Divider sx={{ my: 3 }} />
+            <Typography variant="h5" sx={{ mb: 3 }}>
+              Global Habits
+            </Typography>
+            <Box sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 2,
+            }}>
+              {globalHabits.map((habit) => (
+                <Habit
+                  habit={habit}
+                  achievements={achievements}
+                  key={habit.id}
+                  completeHandler={handleCompleteGlobalHabit}
+                  isGlobal={true}
+                />
+              ))}
+            </Box>
+          </>
+        )}
       </Box>
 
       {/* Right Side - Mastery Section */}

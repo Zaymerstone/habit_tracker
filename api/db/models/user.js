@@ -16,6 +16,9 @@ module.exports = (sequelize, DataTypes) => {
       User.hasMany(models.UserAchievement, { foreignKey: "userId" });
       User.belongsTo(models.Level, { foreignKey: "levelId" });
       User.hasMany(models.Habit, { foreignKey: "userId" }); // верно смотри по юзеру
+
+      // Add association for UserGlobalHabit
+      User.hasMany(models.UserGlobalHabit, { foreignKey: "userId" });
     }
   }
   User.init(
@@ -28,7 +31,7 @@ module.exports = (sequelize, DataTypes) => {
       last_login: DataTypes.DATE,
       levelId: DataTypes.INTEGER,
       xp: DataTypes.INTEGER,
-      roleId: DataTypes.INTEGER
+      roleId: DataTypes.INTEGER,
     },
     {
       sequelize,

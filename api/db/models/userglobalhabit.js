@@ -1,35 +1,39 @@
 "use strict";
 const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
-  class UserAchievement extends Model {
+  class UserGlobalHabit extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      UserAchievement.belongsTo(models.Habit, { foreignKey: "habitId" });
-      UserAchievement.belongsTo(models.GlobalHabit, {
+      UserGlobalHabit.belongsTo(models.GlobalHabit, {
         foreignKey: "globalHabitId",
       });
-      UserAchievement.belongsTo(models.User, {
+      UserGlobalHabit.belongsTo(models.User, {
         foreignKey: "userId",
         onDelete: "CASCADE",
       });
-      UserAchievement.belongsTo(models.Mastery, { foreignKey: "masteryId" });
     }
   }
-  UserAchievement.init(
+  UserGlobalHabit.init(
     {
+      // User ID this progress belongs to
       userId: DataTypes.INTEGER,
-      habitId: DataTypes.INTEGER,
+      // Reference to the global habit
       globalHabitId: DataTypes.INTEGER,
-      masteryId: DataTypes.INTEGER,
+      // Current streak
+      streak: DataTypes.INTEGER,
+      // Maximum streak achieved
+      max_streak: DataTypes.INTEGER,
+      // Date of last completion
+      lastCompletion: DataTypes.DATE,
     },
     {
       sequelize,
-      modelName: "UserAchievement",
+      modelName: "UserGlobalHabit",
     }
   );
-  return UserAchievement;
+  return UserGlobalHabit;
 };

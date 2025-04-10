@@ -1,11 +1,17 @@
-const { CompletedHabit, Habit } = require("../../db/models");
+const {
+  CompletedHabit,
+  Habit,
+  GlobalCompletedHabit,
+  GlobalHabit,
+  UserGlobalHabit,
+} = require("../../db/models");
 const { Op } = require("sequelize");
-const { format } = require("date-fns"); 
+const { format } = require("date-fns");
 
 async function getPersonalCompletionData(req, res) {
   try {
     const userId = req.userId;
-    const { habitId } = req.query;
+    const { habitId, isGlobal } = req.query;
     const currentDate = new Date();
 
     // Get the first day of the current and two previous months
@@ -37,86 +43,171 @@ async function getPersonalCompletionData(req, res) {
       0
     );
 
-    // Get the habit details
-    const habit = await Habit.findOne({
-      where: { id: parseInt(habitId), userId },
-    });
+    let days, everyday;
 
-    if (!habit) {
-      return res.status(404).json({ message: "Habit not found" });
-    }
+    if (isGlobal === "true") {
+      // Get the global habit details
+      const globalHabit = await GlobalHabit.findByPk(parseInt(habitId));
 
-    const { days, everyday } = habit;
-
-    // Fetch completed records within the last three months
-    const habitCompletions = await CompletedHabit.findAll({
-      where: {
-        userId,
-        habitId,
-        createdAt: {
-          [Op.between]: [firstDayTwoMonthsAgo, currentDate], // Last two months + current month
-        },
-      },
-    });
-
-    // Helper function to calculate planned completions
-    function calculatePlannedCompletions(startDate, endDate) {
-      let count = 0;
-      let current = new Date(startDate);
-
-      while (current <= endDate) {
-        if (everyday || days.includes(current.getDay())) {
-          count++;
-        }
-        current.setDate(current.getDate() + 1);
+      if (!globalHabit) {
+        return res.status(404).json({ message: "Global habit not found" });
       }
 
-      return count;
+      days = globalHabit.days;
+      everyday = globalHabit.everyday;
+
+      // Fetch completed records for global habit
+      const habitCompletions = await GlobalCompletedHabit.findAll({
+        where: {
+          userId,
+          globalHabitId: parseInt(habitId),
+          createdAt: {
+            [Op.between]: [firstDayTwoMonthsAgo, currentDate], // Last two months + current month
+          },
+        },
+      });
+
+      // Helper function to calculate planned completions
+      function calculatePlannedCompletions(startDate, endDate) {
+        let count = 0;
+        let current = new Date(startDate);
+
+        while (current <= endDate) {
+          if (everyday || days.includes(current.getDay())) {
+            count++;
+          }
+          current.setDate(current.getDate() + 1);
+        }
+
+        return count;
+      }
+
+      function getMonthYearString(date) {
+        return date.toLocaleString("en-US", { month: "long", year: "numeric" });
+      }
+
+      // Organize data into months
+      const data = [
+        {
+          month: getMonthYearString(firstDayTwoMonthsAgo),
+          actualCompletions: habitCompletions.filter(
+            (h) =>
+              new Date(h.createdAt) >= firstDayTwoMonthsAgo &&
+              new Date(h.createdAt) <= lastDayTwoMonthsAgo
+          ).length,
+          plannedCompletions: calculatePlannedCompletions(
+            firstDayTwoMonthsAgo,
+            lastDayTwoMonthsAgo
+          ),
+        },
+        {
+          month: getMonthYearString(firstDayPrevMonth),
+          actualCompletions: habitCompletions.filter(
+            (h) =>
+              new Date(h.createdAt) >= firstDayPrevMonth &&
+              new Date(h.createdAt) <= lastDayPrevMonth
+          ).length,
+          plannedCompletions: calculatePlannedCompletions(
+            firstDayPrevMonth,
+            lastDayPrevMonth
+          ),
+        },
+        {
+          month: getMonthYearString(firstDayCurrentMonth),
+          actualCompletions: habitCompletions.filter(
+            (h) => new Date(h.createdAt) >= firstDayCurrentMonth
+          ).length,
+          plannedCompletions: calculatePlannedCompletions(
+            firstDayCurrentMonth,
+            currentDate
+          ),
+        },
+      ];
+
+      return res.status(200).json(data);
+    } else {
+      // Get the habit details
+      const habit = await Habit.findOne({
+        where: { id: parseInt(habitId), userId },
+      });
+
+      if (!habit) {
+        return res.status(404).json({ message: "Habit not found" });
+      }
+
+      days = habit.days;
+      everyday = habit.everyday;
+
+      // Fetch completed records within the last three months
+      const habitCompletions = await CompletedHabit.findAll({
+        where: {
+          userId,
+          habitId,
+          createdAt: {
+            [Op.between]: [firstDayTwoMonthsAgo, currentDate], // Last two months + current month
+          },
+        },
+      });
+
+      // Helper function to calculate planned completions
+      function calculatePlannedCompletions(startDate, endDate) {
+        let count = 0;
+        let current = new Date(startDate);
+
+        while (current <= endDate) {
+          if (everyday || days.includes(current.getDay())) {
+            count++;
+          }
+          current.setDate(current.getDate() + 1);
+        }
+
+        return count;
+      }
+
+      function getMonthYearString(date) {
+        return date.toLocaleString("en-US", { month: "long", year: "numeric" });
+      }
+
+      // Organize data into months
+      const data = [
+        {
+          month: getMonthYearString(firstDayTwoMonthsAgo),
+          actualCompletions: habitCompletions.filter(
+            (h) =>
+              new Date(h.createdAt) >= firstDayTwoMonthsAgo &&
+              new Date(h.createdAt) <= lastDayTwoMonthsAgo
+          ).length,
+          plannedCompletions: calculatePlannedCompletions(
+            firstDayTwoMonthsAgo,
+            lastDayTwoMonthsAgo
+          ),
+        },
+        {
+          month: getMonthYearString(firstDayPrevMonth),
+          actualCompletions: habitCompletions.filter(
+            (h) =>
+              new Date(h.createdAt) >= firstDayPrevMonth &&
+              new Date(h.createdAt) <= lastDayPrevMonth
+          ).length,
+          plannedCompletions: calculatePlannedCompletions(
+            firstDayPrevMonth,
+            lastDayPrevMonth
+          ),
+        },
+        {
+          month: getMonthYearString(firstDayCurrentMonth),
+          actualCompletions: habitCompletions.filter(
+            (h) => new Date(h.createdAt) >= firstDayCurrentMonth
+          ).length,
+          plannedCompletions: calculatePlannedCompletions(
+            firstDayCurrentMonth,
+            currentDate
+          ),
+        },
+      ];
+
+      return res.status(200).json(data);
     }
-
-    function getMonthYearString(date) {
-      return date.toLocaleString("en-US", { month: "long", year: "numeric" });
-    }
-
-    // Organize data into months
-    const data = [
-      {
-        month: getMonthYearString(firstDayTwoMonthsAgo),
-        actualCompletions: habitCompletions.filter(
-          (h) =>
-            new Date(h.createdAt) >= firstDayTwoMonthsAgo &&
-            new Date(h.createdAt) <= lastDayTwoMonthsAgo
-        ).length,
-        plannedCompletions: calculatePlannedCompletions(
-          firstDayTwoMonthsAgo,
-          lastDayTwoMonthsAgo
-        ),
-      },
-      {
-        month: getMonthYearString(firstDayPrevMonth),
-        actualCompletions: habitCompletions.filter(
-          (h) =>
-            new Date(h.createdAt) >= firstDayPrevMonth &&
-            new Date(h.createdAt) <= lastDayPrevMonth
-        ).length,
-        plannedCompletions: calculatePlannedCompletions(
-          firstDayPrevMonth,
-          lastDayPrevMonth
-        ),
-      },
-      {
-        month: getMonthYearString(firstDayCurrentMonth),
-        actualCompletions: habitCompletions.filter(
-          (h) => new Date(h.createdAt) >= firstDayCurrentMonth
-        ).length,
-        plannedCompletions: calculatePlannedCompletions(
-          firstDayCurrentMonth,
-          currentDate
-        ),
-      },
-    ];
-
-    return res.status(200).json(data);
   } catch (error) {
     console.error("Error getting habit completions", error);
     return res.status(500).json({ message: "Error getting habit completions" });
@@ -210,8 +301,12 @@ async function getUserActivity(req, res) {
       });
 
       const activeUsers = userHabitCounts.size;
-      const totalHabitsCompleted = [...userHabitCounts.values()].reduce((sum, count) => sum + count, 0);
-      const avgHabitsPerUser = activeUsers > 0 ? totalHabitsCompleted / activeUsers : 0;
+      const totalHabitsCompleted = [...userHabitCounts.values()].reduce(
+        (sum, count) => sum + count,
+        0
+      );
+      const avgHabitsPerUser =
+        activeUsers > 0 ? totalHabitsCompleted / activeUsers : 0;
 
       return {
         datetime: format(point, dateFormat),
@@ -229,5 +324,5 @@ async function getUserActivity(req, res) {
 
 module.exports = {
   getPersonalCompletionData,
-  getUserActivity
+  getUserActivity,
 };

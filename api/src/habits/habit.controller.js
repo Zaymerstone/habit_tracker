@@ -224,7 +224,7 @@ function calculateStreak(habit) {
 
   if (everyday) {
     if (difference >= oneDayMs * 2) {
-      streak = 0; // Reset streak if more than 2 days gap
+      streak = 1; // Reset streak if more than 2 days gap
     } else {
       streak += 1;
       max_streak = Math.max(max_streak, streak);
@@ -244,11 +244,11 @@ function calculateStreak(habit) {
 
     // Check if any missing days were supposed to be done
     if (days.some((d) => daysBetween.includes(d))) {
-      streak = 0; // Break streak if any required day was skipped
+      streak = 1; // Break streak if any required day was skipped
     } else {
       const weekDifference = Math.floor(difference / (7 * oneDayMs));
       if (weekDifference > 0) {
-        streak = 0; // More than a week passed, reset streak
+        streak = 1; // More than a week passed, reset streak
       } else {
         streak += 1;
         max_streak = Math.max(max_streak, streak);

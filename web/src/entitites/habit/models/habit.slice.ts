@@ -8,6 +8,7 @@ import {
   CreateHabitPayload,
   UpdateHabitPayload,
 } from "../../habit/types/habit.payload";
+import { checkUser } from "../../user/models/user.slice";
 
 export interface HabitData {
   id: number;
@@ -101,6 +102,34 @@ export const completeHabit = createAsyncThunk(
       return response.data;
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
+        return rejectWithValue(error.response?.data);
+      }
+    }
+  }
+);
+
+export const completeGlobalHabit = createAsyncThunk(
+  "habit/completeGlobal",
+  async (globalHabitId: number, { rejectWithValue, dispatch }) => {
+    try {
+      const response = await tokenizedAxiosInstance.post(
+        ApiPath.CompleteGlobalHabit,
+        { globalHabitId }
+      );
+
+      toast.success("Global habit completed successfully!");
+
+      // Refresh user data to get updated global habits
+      dispatch(checkUser());
+
+      return response.data;
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        // Show error message
+        const errorMessage =
+          error.response?.data?.message || "Failed to complete global habit";
+        toast.error(errorMessage);
+
         return rejectWithValue(error.response?.data);
       }
     }
